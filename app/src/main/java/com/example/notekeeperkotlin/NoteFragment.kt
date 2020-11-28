@@ -7,22 +7,35 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Spinner
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.navArgs
+import com.google.android.material.textfield.TextInputEditText
 
 /**
  * A simple [Fragment] subclass as the default destination in the navigation.
  */
 class NoteFragment : Fragment() {
 
+    private var note : NoteInfo? = null
+    private var isNewNote = true
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?,
             savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_note, container, false)
+        val view = inflater.inflate(R.layout.fragment_note, container, false)
+
+        val args = NoteFragmentArgs.fromBundle(requireArguments())
+        note = args.noteInfo
+        isNewNote = note == null
+
+        return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        requireActivity().title = "Edit Note"
+
 
 
         val courses = DataManager.getInstance().courses
@@ -35,5 +48,28 @@ class NoteFragment : Fragment() {
         val spinnerCourses = view.findViewById<Spinner>(R.id.spinner_courses)
 
         spinnerCourses.adapter = adapterCourses
+
+
+        val textNoteTitle = view.findViewById<TextInputEditText>(R.id.text_note_title)
+        val textNoteText = view.findViewById<TextInputEditText>(R.id.text_note_text)
+
+        if(!isNewNote){
+        displayNote(spinnerCourses,textNoteTitle,textNoteText)}
+    }
+
+    private fun displayNote(
+        spinnerCourses: Spinner?,
+        textNoteTitle: TextInputEditText?,
+        textNoteText: TextInputEditText?
+    ) {
+
+
+
+
+        val courses = DataManager.getInstance().courses
+        val courseIndex = courses.indexOf(note!!.course)
+        spinnerCourses!!.setSelection(courseIndex)
+        textNoteTitle!!.setText (note!!.title)
+        textNoteText!!.setText (note!!.text)
     }
 }
