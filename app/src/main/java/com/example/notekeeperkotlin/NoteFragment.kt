@@ -1,12 +1,12 @@
 package com.example.notekeeperkotlin
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import androidx.navigation.fragment.findNavController
+import android.widget.ArrayAdapter
+import android.widget.Spinner
+import androidx.fragment.app.Fragment
 
 /**
  * A simple [Fragment] subclass as the default destination in the navigation.
@@ -25,5 +25,15 @@ class NoteFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
 
+        val courses = DataManager.getInstance().courses
+
+        val adapterCourses =
+            ArrayAdapter<CourseInfo>(requireContext(),android.R.layout.simple_spinner_item,courses)
+
+        adapterCourses.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+
+        val spinnerCourses = view.findViewById<Spinner>(R.id.spinner_courses)
+
+        spinnerCourses.adapter = adapterCourses
     }
 }
