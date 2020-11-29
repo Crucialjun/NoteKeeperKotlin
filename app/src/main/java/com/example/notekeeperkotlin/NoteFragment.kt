@@ -19,6 +19,7 @@ class NoteFragment : Fragment() {
     private var spinnerCourses: Spinner? = null
     private var textNoteTitle: TextInputEditText? = null
     private var textNoteText: TextInputEditText? = null
+    private var notePosition: Int = -1
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?,
             savedInstanceState: Bundle?
@@ -36,9 +37,17 @@ class NoteFragment : Fragment() {
         val args = NoteFragmentArgs.fromBundle(requireArguments())
         position = args.notePosition
         isNewNote = position == -1
-        if (!isNewNote) {
+        if (isNewNote) {
+            createNewNote()
+        } else {
             mNote = DataManager.getInstance().notes[position]
         }
+    }
+
+    private fun createNewNote() {
+        val dm = DataManager.getInstance()
+        notePosition = dm.createNewNote()
+        mNote = dm.notes[notePosition]
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -55,15 +64,15 @@ class NoteFragment : Fragment() {
         adapterCourses.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
 
 
-        spinnerCourses = view.findViewById<Spinner>(R.id.spinner_courses)
+        spinnerCourses = view.findViewById(R.id.spinner_courses)
 
         spinnerCourses!!.adapter = adapterCourses
 
 
 
-        textNoteTitle = view.findViewById<TextInputEditText>(R.id.text_note_title)
+        textNoteTitle = view.findViewById(R.id.text_note_title)
 
-        textNoteText = view.findViewById<TextInputEditText>(R.id.text_note_text)
+        textNoteText = view.findViewById(R.id.text_note_text)
 
         if (!isNewNote) {
             displayNote(spinnerCourses, textNoteTitle, textNoteText)
@@ -114,6 +123,18 @@ class NoteFragment : Fragment() {
         intent.putExtra(Intent.EXTRA_SUBJECT, subject)
         intent.putExtra(Intent.EXTRA_TEXT, text)
         startActivity(intent)
+
+    }
+
+    override fun onPause() {
+        super.onPause()
+        saveNote()
+    }
+
+    private fun saveNote() {
+        mNote!!.course = spinnerCourses!!.selectedItem as CourseInfo?
+        mNote!!.title = textNoteTitle!!.text.toString()
+        mNote!!.text = textNoteText!!.text.toString()
 
     }
 }
