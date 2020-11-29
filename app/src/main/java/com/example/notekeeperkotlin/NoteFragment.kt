@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Spinner
 import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.navArgs
 import com.google.android.material.textfield.TextInputEditText
 
 /**
@@ -24,11 +23,15 @@ class NoteFragment : Fragment() {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_note, container, false)
 
+        readDisplayStateValues()
+
+        return view
+    }
+
+    private fun readDisplayStateValues() {
         val args = NoteFragmentArgs.fromBundle(requireArguments())
         note = args.noteInfo
         isNewNote = note == null
-
-        return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -37,11 +40,10 @@ class NoteFragment : Fragment() {
         requireActivity().title = "Edit Note"
 
 
-
         val courses = DataManager.getInstance().courses
 
         val adapterCourses =
-            ArrayAdapter<CourseInfo>(requireContext(),android.R.layout.simple_spinner_item,courses)
+                ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, courses)
 
         adapterCourses.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
 
