@@ -1,9 +1,8 @@
 package com.example.notekeeperkotlin
 
+import android.content.Intent
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.ArrayAdapter
 import android.widget.Spinner
 import androidx.fragment.app.Fragment
@@ -17,6 +16,9 @@ class NoteFragment : Fragment() {
     private var position = -1
     private var isNewNote = true
     private var mNote: NoteInfo? = null
+    private var spinnerCourses: Spinner? = null
+    private var textNoteTitle: TextInputEditText? = null
+    private var textNoteText: TextInputEditText? = null
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?,
             savedInstanceState: Bundle?
@@ -24,6 +26,7 @@ class NoteFragment : Fragment() {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_note, container, false)
 
+        setHasOptionsMenu(true)
         readDisplayStateValues()
 
         return view
@@ -51,22 +54,26 @@ class NoteFragment : Fragment() {
 
         adapterCourses.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
 
-        val spinnerCourses = view.findViewById<Spinner>(R.id.spinner_courses)
 
-        spinnerCourses.adapter = adapterCourses
+        spinnerCourses = view.findViewById<Spinner>(R.id.spinner_courses)
+
+        spinnerCourses!!.adapter = adapterCourses
 
 
-        val textNoteTitle = view.findViewById<TextInputEditText>(R.id.text_note_title)
-        val textNoteText = view.findViewById<TextInputEditText>(R.id.text_note_text)
 
-        if(!isNewNote){
-        displayNote(spinnerCourses,textNoteTitle,textNoteText)}
+        textNoteTitle = view.findViewById<TextInputEditText>(R.id.text_note_title)
+
+        textNoteText = view.findViewById<TextInputEditText>(R.id.text_note_text)
+
+        if (!isNewNote) {
+            displayNote(spinnerCourses, textNoteTitle, textNoteText)
+        }
     }
 
     private fun displayNote(
-        spinnerCourses: Spinner?,
-        textNoteTitle: TextInputEditText?,
-        textNoteText: TextInputEditText?
+            spinnerCourses: Spinner?,
+            textNoteTitle: TextInputEditText?,
+            textNoteText: TextInputEditText?
     ) {
 
         val courses = DataManager.getInstance().courses
@@ -74,5 +81,39 @@ class NoteFragment : Fragment() {
         spinnerCourses!!.setSelection(courseIndex)
         textNoteTitle!!.setText(mNote!!.title)
         textNoteText!!.setText(mNote!!.text)
+    }
+
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.menu_note, menu)
+        super.onCreateOptionsMenu(menu, inflater)
+    }
+
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        return when (item.itemId) {
+            R.id.action_send_mail -> {
+                sendEmail()
+                return true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    private fun sendEmail() {
+        val course: CourseInfo = spinnerCourses!!.selectedItem as CourseInfo
+        val subject = textNoteTitle!!.text.toString()
+        val text = "Checkout what i learned in the Pluralsight course " +
+                "\"${course.title}\" ${textNoteText!!.text.toString()} "
+
+        val intent = Intent(Intent.ACTION_SEND)
+        intent.type = "message/rfc2822"
+        intent.putExtra(Intent.EXTRA_SUBJECT, subject)
+        intent.putExtra(Intent.EXTRA_TEXT, text)
+        startActivity(intent)
+
     }
 }
