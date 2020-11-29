@@ -14,8 +14,9 @@ import com.google.android.material.textfield.TextInputEditText
  */
 class NoteFragment : Fragment() {
 
-    private var note : NoteInfo? = null
+    private var position = -1
     private var isNewNote = true
+    private var mNote: NoteInfo? = null
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?,
             savedInstanceState: Bundle?
@@ -30,8 +31,11 @@ class NoteFragment : Fragment() {
 
     private fun readDisplayStateValues() {
         val args = NoteFragmentArgs.fromBundle(requireArguments())
-        note = args.noteInfo
-        isNewNote = note == null
+        position = args.notePosition
+        isNewNote = position == -1
+        if (!isNewNote) {
+            mNote = DataManager.getInstance().notes[position]
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -65,13 +69,10 @@ class NoteFragment : Fragment() {
         textNoteText: TextInputEditText?
     ) {
 
-
-
-
         val courses = DataManager.getInstance().courses
-        val courseIndex = courses.indexOf(note!!.course)
+        val courseIndex = courses.indexOf(mNote!!.course)
         spinnerCourses!!.setSelection(courseIndex)
-        textNoteTitle!!.setText (note!!.title)
-        textNoteText!!.setText (note!!.text)
+        textNoteTitle!!.setText(mNote!!.title)
+        textNoteText!!.setText(mNote!!.text)
     }
 }

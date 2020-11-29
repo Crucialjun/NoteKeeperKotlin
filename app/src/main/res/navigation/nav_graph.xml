@@ -3,27 +3,26 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/SecondFragment">
+    app:startDestination="@id/NoteListFragment">
 
     <fragment
-        android:id="@+id/FirstFragment"
+        android:id="@+id/NoteFragment"
         android:name="com.example.notekeeperkotlin.NoteFragment"
         android:label="@string/first_fragment_label"
         tools:layout="@layout/fragment_note">
         <argument
-            android:name="noteInfo"
-            app:argType="com.example.notekeeperkotlin.NoteInfo"
-            app:nullable="true"
-            android:defaultValue="@null" />
+            android:name="notePosition"
+            android:defaultValue="-1"
+            app:argType="integer" />
     </fragment>
     <fragment
-        android:id="@+id/SecondFragment"
+        android:id="@+id/NoteListFragment"
         android:name="com.example.notekeeperkotlin.NoteListFragment"
         android:label="@string/second_fragment_label"
         tools:layout="@layout/fragment_note_list">
 
         <action
             android:id="@+id/action_SecondFragment_to_FirstFragment"
-            app:destination="@id/FirstFragment" />
+            app:destination="@id/NoteFragment" />
     </fragment>
 </navigation>

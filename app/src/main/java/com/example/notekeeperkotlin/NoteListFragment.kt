@@ -1,16 +1,15 @@
 package com.example.notekeeperkotlin
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.ListView
+import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.android.material.snackbar.Snackbar
 
 /**
  * A simple [Fragment] subclass as the second destination in the navigation.
@@ -31,7 +30,7 @@ class NoteListFragment : Fragment() {
         requireActivity().title = "NoteKeeper"
        val fab = view.findViewById<FloatingActionButton>(R.id.fab)
         fab.setOnClickListener { p0 ->
-            val action = NoteListFragmentDirections.actionSecondFragmentToFirstFragment()
+            val action = NoteListFragmentDirections.actionSecondFragmentToFirstFragment(-1)
             p0!!.findNavController().navigate(action)
         }
 
@@ -50,8 +49,9 @@ class NoteListFragment : Fragment() {
 
         notesList.onItemClickListener =
             AdapterView.OnItemClickListener { p0, p1, position, p3 ->
-                val note : NoteInfo = notesList.getItemAtPosition(position) as NoteInfo
-                val action = NoteListFragmentDirections.actionSecondFragmentToFirstFragment(note)
-                p1!!.findNavController().navigate(action) }
+                //val note : NoteInfo = notesList.getItemAtPosition(position) as NoteInfo
+                val action = NoteListFragmentDirections.actionSecondFragmentToFirstFragment(position)
+                p1!!.findNavController().navigate(action)
+            }
     }
 }
