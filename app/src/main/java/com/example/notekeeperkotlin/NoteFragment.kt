@@ -6,6 +6,7 @@ import android.view.*
 import android.widget.ArrayAdapter
 import android.widget.Spinner
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.google.android.material.textfield.TextInputEditText
 
 /**
@@ -20,6 +21,7 @@ class NoteFragment : Fragment() {
     private var textNoteTitle: TextInputEditText? = null
     private var textNoteText: TextInputEditText? = null
     private var notePosition: Int = -1
+    private var isCancelling: Boolean = false
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?,
             savedInstanceState: Bundle?
@@ -108,6 +110,11 @@ class NoteFragment : Fragment() {
                 sendEmail()
                 return true
             }
+            R.id.action_cancel -> {
+                isCancelling = true
+                findNavController().popBackStack()
+                return true
+            }
             else -> super.onOptionsItemSelected(item)
         }
     }
@@ -128,7 +135,13 @@ class NoteFragment : Fragment() {
 
     override fun onPause() {
         super.onPause()
-        saveNote()
+        if (isCancelling) {
+            if (isNewNote) {
+                DataManager.getInstance().removeNote(notePosition)
+            }
+        } else {
+            saveNote()
+        }
     }
 
     private fun saveNote() {

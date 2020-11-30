@@ -8,7 +8,7 @@
     <fragment
         android:id="@+id/NoteFragment"
         android:name="com.example.notekeeperkotlin.NoteFragment"
-        android:label="@string/first_fragment_label"
+        android:label="NoteFragment"
         tools:layout="@layout/fragment_note">
         <argument
             android:name="notePosition"
@@ -18,7 +18,7 @@
     <fragment
         android:id="@+id/NoteListFragment"
         android:name="com.example.notekeeperkotlin.NoteListFragment"
-        android:label="@string/second_fragment_label"
+        android:label="NoteListFragment"
         tools:layout="@layout/fragment_note_list">
 
         <action
