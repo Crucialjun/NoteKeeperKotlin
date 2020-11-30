@@ -6,6 +6,7 @@ import android.view.*
 import android.widget.ArrayAdapter
 import android.widget.Spinner
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.textfield.TextInputEditText
 
@@ -22,17 +23,43 @@ class NoteFragment : Fragment() {
     private var textNoteText: TextInputEditText? = null
     private var notePosition: Int = -1
     private var isCancelling: Boolean = false
+    private var viewModel: NoteFragmentViewModel? = null
+
     override fun onCreateView(
-            inflater: LayoutInflater, container: ViewGroup?,
-            savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_note, container, false)
 
+        val viewModelProvider = ViewModelProvider(
+            viewModelStore,
+            ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application)
+        )
+
+
+        viewModel = viewModelProvider.get(NoteFragmentViewModel::class.java)
+        if (viewModel!!.isNewlyCreated && savedInstanceState != null) {
+            viewModel!!.restoreState(savedInstanceState)
+        }
+
+        viewModel!!.isNewlyCreated = false
         setHasOptionsMenu(true)
         readDisplayStateValues()
+        saveOriginalNoteValues()
 
         return view
+    }
+
+    private fun saveOriginalNoteValues() {
+        if (isNewNote) {
+            return
+        } else {
+            viewModel!!.originalNoteCourseID = mNote!!.course.courseId
+            viewModel!!.originalNoteTitle = mNote!!.title
+            viewModel!!.originalNoteText = mNote!!.text
+
+        }
     }
 
     private fun readDisplayStateValues() {
@@ -138,10 +165,20 @@ class NoteFragment : Fragment() {
         if (isCancelling) {
             if (isNewNote) {
                 DataManager.getInstance().removeNote(notePosition)
+            } else {
+                storePreviousNotevalues()
             }
         } else {
             saveNote()
         }
+    }
+
+    private fun storePreviousNotevalues() {
+        val course = DataManager.getInstance().getCourse(viewModel.originalNoteCourseID)
+        mNote!!.course = course
+        mNote!!.title = viewModel!!.originalNoteTitle
+        mNote!!.text = viewModel!!.originalNoteText
+
     }
 
     private fun saveNote() {
@@ -149,5 +186,11 @@ class NoteFragment : Fragment() {
         mNote!!.title = textNoteTitle!!.text.toString()
         mNote!!.text = textNoteText!!.text.toString()
 
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+
+        viewModel!!.saveState(outState)
     }
 }
