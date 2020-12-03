@@ -6,11 +6,11 @@ import java.util.List;
 public class DataManager {
     private static DataManager ourInstance = null;
 
-    private List<CourseInfo> mCourses = new ArrayList<>();
-    private List<NoteInfo> mNotes = new ArrayList<>();
+    private final List<CourseInfo> mCourses = new ArrayList<>();
+    private final List<NoteInfo> mNotes = new ArrayList<>();
 
     public static DataManager getInstance() {
-        if(ourInstance == null) {
+        if (ourInstance == null) {
             ourInstance = new DataManager();
             ourInstance.initializeCourses();
             ourInstance.initializeExampleNotes();
@@ -188,6 +188,15 @@ public class DataManager {
         modules.add(new ModuleInfo("java_core_m10", "Persisting Objects with Serialization"));
 
         return new CourseInfo("java_core", "Java Fundamentals: The Core Platform", modules);
+    }
+
+    public int createNewNote(CourseInfo course, String noteTitle, String noteText) {
+        int index = createNewNote();
+        NoteInfo note = getNotes().get(index);
+        note.setCourse(course);
+        note.setTitle(noteTitle);
+        note.setText(noteText);
+        return index;
     }
     //endregion
 
