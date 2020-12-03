@@ -174,7 +174,7 @@ class NoteFragment : Fragment() {
     }
 
     private fun storePreviousNotevalues() {
-        val course = DataManager.getInstance().getCourse(viewModel.originalNoteCourseID)
+        val course = DataManager.getInstance().getCourse(viewModel!!.originalNoteCourseID)
         mNote!!.course = course
         mNote!!.title = viewModel!!.originalNoteTitle
         mNote!!.text = viewModel!!.originalNoteText
