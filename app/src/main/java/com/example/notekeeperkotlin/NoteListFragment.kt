@@ -4,11 +4,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
-import android.widget.ListView
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 /**
@@ -38,20 +37,25 @@ class NoteListFragment : Fragment() {
     }
 
     private fun initializeDisplayContent(view: View) {
-        val notesList = view.findViewById<ListView>(R.id.list_notes)
+//        val notesList = view.findViewById<ListView>(R.id.list_notes)
+//
+//        val notes = DataManager.getInstance().notes
+//
+//        val adapterNotes =
+//            ArrayAdapter(requireContext(),android.R.layout.simple_list_item_1,notes)
+//
+//        notesList.adapter = adapterNotes
+//
+//        notesList.onItemClickListener =
+//            AdapterView.OnItemClickListener { p0, p1, position, p3 ->
+//                //val note : NoteInfo = notesList.getItemAtPosition(position) as NoteInfo
+//                val action = NoteListFragmentDirections.actionSecondFragmentToFirstFragment(position)
+//                p1!!.findNavController().navigate(action)
+//            }
 
-        val notes = DataManager.getInstance().notes
+        val notesList = view.findViewById<RecyclerView>(R.id.list_notes)
+        val notesLayoutManager = LinearLayoutManager(context)
+        notesList.layoutManager = notesLayoutManager
 
-        val adapterNotes =
-            ArrayAdapter(requireContext(),android.R.layout.simple_list_item_1,notes)
-
-        notesList.adapter = adapterNotes
-
-        notesList.onItemClickListener =
-            AdapterView.OnItemClickListener { p0, p1, position, p3 ->
-                //val note : NoteInfo = notesList.getItemAtPosition(position) as NoteInfo
-                val action = NoteListFragmentDirections.actionSecondFragmentToFirstFragment(position)
-                p1!!.findNavController().navigate(action)
-            }
     }
 }
