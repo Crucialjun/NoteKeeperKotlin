@@ -142,8 +142,16 @@ class NoteFragment : Fragment() {
                 findNavController().popBackStack()
                 return true
             }
+            R.id.action_next -> {
+                moveNext()
+                return true
+            }
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    private fun moveNext() {
+        TODO("Not yet implemented")
     }
 
     private fun sendEmail() {
