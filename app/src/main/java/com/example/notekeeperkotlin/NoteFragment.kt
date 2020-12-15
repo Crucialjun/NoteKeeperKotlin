@@ -150,8 +150,24 @@ class NoteFragment : Fragment() {
         }
     }
 
+    override fun onPrepareOptionsMenu(menu: Menu) {
+        val item = menu.findItem(R.id.action_next)
+        val lastNoteIndex = DataManager.getInstance().notes.size - 1
+        item.isEnabled = position < lastNoteIndex
+        super.onPrepareOptionsMenu(menu)
+    }
+
     private fun moveNext() {
-        TODO("Not yet implemented")
+        saveNote()
+
+
+        position += 1
+        mNote = DataManager.getInstance().notes[position]
+
+        saveOriginalNoteValues()
+
+        displayNote(spinnerCourses, textNoteTitle, textNoteText)
+        requireActivity().invalidateOptionsMenu()
     }
 
     private fun sendEmail() {
