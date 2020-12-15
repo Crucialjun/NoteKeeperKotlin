@@ -57,5 +57,10 @@ class NoteListFragment : Fragment() {
         val notesLayoutManager = LinearLayoutManager(context)
         notesList.layoutManager = notesLayoutManager
 
+        val notes = DataManager.getInstance().notes
+        val noteRecyclerAdapter = NoteRecyclerAdapter(requireContext(), notes)
+        notesList.adapter = noteRecyclerAdapter
+
+
     }
 }
