@@ -142,8 +142,32 @@ class NoteFragment : Fragment() {
                 findNavController().popBackStack()
                 return true
             }
+            R.id.action_next -> {
+                moveNext()
+                return true
+            }
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu) {
+        val item = menu.findItem(R.id.action_next)
+        val lastNoteIndex = DataManager.getInstance().notes.size - 1
+        item.isEnabled = position < lastNoteIndex
+        super.onPrepareOptionsMenu(menu)
+    }
+
+    private fun moveNext() {
+        saveNote()
+
+
+        position += 1
+        mNote = DataManager.getInstance().notes[position]
+
+        saveOriginalNoteValues()
+
+        displayNote(spinnerCourses, textNoteTitle, textNoteText)
+        requireActivity().invalidateOptionsMenu()
     }
 
     private fun sendEmail() {
