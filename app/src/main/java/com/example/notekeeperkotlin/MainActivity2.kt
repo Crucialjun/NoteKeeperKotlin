@@ -17,7 +17,7 @@ import com.google.android.material.snackbar.Snackbar
 class MainActivity2 : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
-    lateinit var drawerLayout: DrawerLayout
+    private lateinit var drawerLayout: DrawerLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,6 +38,7 @@ class MainActivity2 : AppCompatActivity(), NavigationView.OnNavigationItemSelect
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
         navView.setNavigationItemSelectedListener(this)
+        navView.menu.getItem(0).isChecked = true
         drawerLayout.closeDrawers()
     }
 
@@ -56,7 +57,6 @@ class MainActivity2 : AppCompatActivity(), NavigationView.OnNavigationItemSelect
 
         return when (item.itemId) {
             R.id.nav_notes -> {
-                handleSelection("Notes")
                 drawerLayout.closeDrawers()
                 true
             }

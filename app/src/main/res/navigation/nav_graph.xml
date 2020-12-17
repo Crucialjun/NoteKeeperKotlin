@@ -24,5 +24,13 @@
         <action
             android:id="@+id/action_SecondFragment_to_FirstFragment"
             app:destination="@id/NoteFragment" />
+        <action
+            android:id="@+id/action_NoteListFragment_to_coursesFragment"
+            app:destination="@id/coursesFragment" />
     </fragment>
+    <fragment
+        android:id="@+id/coursesFragment"
+        android:name="com.example.notekeeperkotlin.CoursesFragment"
+        android:label="fragment_courses"
+        tools:layout="@layout/fragment_courses" />
 </navigation>
