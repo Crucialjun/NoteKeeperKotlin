@@ -26,6 +26,7 @@ class NoteListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        requireActivity().actionBar?.setDisplayShowCustomEnabled(false)
         requireActivity().title = "NoteKeeper"
        val fab = view.findViewById<FloatingActionButton>(R.id.fab)
         fab.setOnClickListener { p0 ->
