@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/NoteListFragment">
+    app:startDestination="@id/Nav_notes">
 
     <fragment
         android:id="@+id/NoteFragment"
@@ -16,7 +16,7 @@
             app:argType="integer" />
     </fragment>
     <fragment
-        android:id="@+id/NoteListFragment"
+        android:id="@+id/Nav_notes"
         android:name="com.example.notekeeperkotlin.NoteListFragment"
         android:label="NoteListFragment"
         tools:layout="@layout/fragment_note_list">
@@ -26,10 +26,10 @@
             app:destination="@id/NoteFragment" />
         <action
             android:id="@+id/action_NoteListFragment_to_coursesFragment"
-            app:destination="@id/coursesFragment" />
+            app:destination="@id/Nav_courses" />
     </fragment>
     <fragment
-        android:id="@+id/coursesFragment"
+        android:id="@+id/Nav_courses"
         android:name="com.example.notekeeperkotlin.CoursesFragment"
         android:label="fragment_courses"
         tools:layout="@layout/fragment_courses" />

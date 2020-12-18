@@ -6,6 +6,7 @@ import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
@@ -18,6 +19,8 @@ class MainActivity2 : AppCompatActivity(), NavigationView.OnNavigationItemSelect
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var drawerLayout: DrawerLayout
+    private lateinit var navController: NavController
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,12 +30,14 @@ class MainActivity2 : AppCompatActivity(), NavigationView.OnNavigationItemSelect
 
         drawerLayout = findViewById(R.id.drawer_layout)
         val navView: NavigationView = findViewById(R.id.nav_view)
-        val navController = findNavController(R.id.nav_host_fragment)
+
+        navController = findNavController(R.id.nav_host_fragment)
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         appBarConfiguration = AppBarConfiguration(
             setOf(
-                R.id.NoteListFragment
+                R.id.Nav_notes,
+                R.id.Nav_courses
             ), drawerLayout
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
@@ -61,6 +66,7 @@ class MainActivity2 : AppCompatActivity(), NavigationView.OnNavigationItemSelect
                 true
             }
             R.id.nav_courses -> {
+                navController.navigate(R.id.action_NoteListFragment_to_coursesFragment)
                 handleSelection("Courses")
                 drawerLayout.closeDrawers()
                 true
