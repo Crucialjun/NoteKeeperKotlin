@@ -22,4 +22,6 @@
     <string name="menu_slideshow">Slideshow</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="note_text">Note Text</string>
+    <string name="note_titlehint">Note Title</string>
 </resources>

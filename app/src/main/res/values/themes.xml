@@ -22,4 +22,14 @@
     <style name="Theme.NoteKeeperKotlin.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="Theme.NoteKeeperKotlin.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+    <style name="CourseTitle" parent="TextAppearance.AppCompat.Medium">
+        <item name="android:textColor">@color/pluralsightorange</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="AddFab" parent="Widget.Design.FloatingActionButton">
+        <item name="srcCompat">@drawable/ic_baseline_add_circle_24</item>
+        <item name="tint">@color/white</item>
+    </style>
 </resources>

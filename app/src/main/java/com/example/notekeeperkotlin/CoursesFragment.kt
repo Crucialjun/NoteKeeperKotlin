@@ -25,7 +25,10 @@ class CoursesFragment : Fragment() {
 
         val courses = DataManager.getInstance().courses
         val courseRecyclerAdapter = CourseRecyclerAdapter(requireContext(), courses)
-        val coursesLayoutManager = GridLayoutManager(requireContext(), 2)
+        val coursesLayoutManager = GridLayoutManager(
+            requireContext(),
+            2
+        )
 
         val recyclerView = view.findViewById<RecyclerView>(R.id.list_courses)
         recyclerView.layoutManager = coursesLayoutManager
