@@ -1,6 +1,7 @@
 package com.example.notekeeperkotlin
 
 import android.os.Bundle
+import android.preference.PreferenceManager
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.TextView
@@ -13,7 +14,6 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
-import androidx.preference.PreferenceManager
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
 
