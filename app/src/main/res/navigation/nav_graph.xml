@@ -27,10 +27,17 @@
         <action
             android:id="@+id/action_NoteListFragment_to_coursesFragment"
             app:destination="@id/Nav_courses" />
+        <action
+            android:id="@+id/action_Nav_notes_to_settingsFragment"
+            app:destination="@id/settingsFragment" />
     </fragment>
     <fragment
         android:id="@+id/Nav_courses"
         android:name="com.example.notekeeperkotlin.CoursesFragment"
         android:label="fragment_courses"
         tools:layout="@layout/fragment_courses" />
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.example.notekeeperkotlin.SettingsFragment"
+        android:label="SettingsFragment" />
 </navigation>

@@ -3,6 +3,7 @@ package com.example.notekeeperkotlin
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.drawerlayout.widget.DrawerLayout
@@ -12,6 +13,7 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import androidx.preference.PreferenceManager
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
 
@@ -20,6 +22,7 @@ class MainActivity2 : AppCompatActivity(), NavigationView.OnNavigationItemSelect
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var navController: NavController
+    private lateinit var navView: NavigationView
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -29,7 +32,7 @@ class MainActivity2 : AppCompatActivity(), NavigationView.OnNavigationItemSelect
         setSupportActionBar(toolbar)
 
         drawerLayout = findViewById(R.id.drawer_layout)
-        val navView: NavigationView = findViewById(R.id.nav_view)
+        navView = findViewById(R.id.nav_view)
 
         navController = findNavController(R.id.nav_host_fragment)
         // Passing each menu ID as a set of Ids because each
@@ -92,5 +95,27 @@ class MainActivity2 : AppCompatActivity(), NavigationView.OnNavigationItemSelect
         Snackbar.make(findViewById(R.id.list_notes), message, Snackbar.LENGTH_LONG).show()
     }
 
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == R.id.action_settings) {
+            navController.navigate(R.id.action_Nav_notes_to_settingsFragment)
+        }
+        return super.onOptionsItemSelected(item)
+    }
 
+    override fun onResume() {
+        super.onResume()
+        updateNavHeader()
+    }
+
+    private fun updateNavHeader() {
+        val headerView = navView.getHeaderView(0)
+        val textUsername = headerView.findViewById<TextView>(R.id.text_user_name)
+        val textEmail = headerView.findViewById<TextView>(R.id.text_email_address)
+
+        val prefs = PreferenceManager.getDefaultSharedPreferences(this)
+
+        val username = prefs.getString("user_display_name", "")
+        val emailAddress = prefs.getString("user_email_address", "")
+
+    }
 }
