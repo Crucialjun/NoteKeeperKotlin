@@ -129,5 +129,8 @@ class MainActivity2 : AppCompatActivity(), NavigationView.OnNavigationItemSelect
         val username = prefs.getString("user_display_name", "")
         val emailAddress = prefs.getString("user_email_address", "")
 
+        textUsername.text = username
+        textEmail.text = emailAddress
+
     }
 }
