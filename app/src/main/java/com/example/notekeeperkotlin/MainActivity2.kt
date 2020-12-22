@@ -76,6 +76,7 @@ class MainActivity2 : AppCompatActivity(), NavigationView.OnNavigationItemSelect
             }
             R.id.nav_share -> {
                 handleSelection("Dont think you have shared enough")
+                handleshare()
                 drawerLayout.closeDrawers()
                 true
             }
@@ -89,6 +90,17 @@ class MainActivity2 : AppCompatActivity(), NavigationView.OnNavigationItemSelect
         }
 
 
+    }
+
+    private fun handleshare() {
+        Snackbar.make(
+            currentFocus!!,
+            "Share to - ${
+                PreferenceManager.getDefaultSharedPreferences(this)
+                    .getString("user_favorite_social", "")
+            }",
+            Snackbar.LENGTH_LONG
+        ).show()
     }
 
     private fun handleSelection(message: String) {
