@@ -59,11 +59,11 @@ class NoteListFragment : Fragment() {
 //                p1!!.findNavController().navigate(action)
 //            }
 
+        DataManager.loadFromDatabase(dbOpenHelper)
         val notesList = view.findViewById<RecyclerView>(R.id.list_notes)
         val notesLayoutManager = LinearLayoutManager(context)
         notesList.layoutManager = notesLayoutManager
 
-        val db = dbOpenHelper.readableDatabase
 
         val notes = DataManager.getInstance().notes
         val noteRecyclerAdapter = NoteRecyclerAdapter(requireContext(), notes)
