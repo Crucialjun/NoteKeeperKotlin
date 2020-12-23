@@ -15,9 +15,11 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
  */
 class NoteListFragment : Fragment() {
 
+    private lateinit var dbOpenHelper: NoteKeeperOpenHelper
+
     override fun onCreateView(
-            inflater: LayoutInflater, container: ViewGroup?,
-            savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_note_list, container, false)
@@ -28,11 +30,14 @@ class NoteListFragment : Fragment() {
 
         requireActivity().actionBar?.setDisplayShowCustomEnabled(false)
         requireActivity().title = "NoteKeeper"
-       val fab = view.findViewById<FloatingActionButton>(R.id.fab)
+        val fab = view.findViewById<FloatingActionButton>(R.id.fab)
         fab.setOnClickListener { p0 ->
             val action = NoteListFragmentDirections.actionSecondFragmentToFirstFragment(-1)
             p0!!.findNavController().navigate(action)
         }
+
+
+        dbOpenHelper = NoteKeeperOpenHelper(context)
 
         initializeDisplayContent(view)
     }
@@ -58,10 +63,17 @@ class NoteListFragment : Fragment() {
         val notesLayoutManager = LinearLayoutManager(context)
         notesList.layoutManager = notesLayoutManager
 
+        val db = dbOpenHelper.readableDatabase
+
         val notes = DataManager.getInstance().notes
         val noteRecyclerAdapter = NoteRecyclerAdapter(requireContext(), notes)
         notesList.adapter = noteRecyclerAdapter
 
 
+    }
+
+    override fun onDestroyView() {
+        dbOpenHelper.close()
+        super.onDestroyView()
     }
 }

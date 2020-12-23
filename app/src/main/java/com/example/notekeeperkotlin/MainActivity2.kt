@@ -133,4 +133,6 @@ class MainActivity2 : AppCompatActivity(), NavigationView.OnNavigationItemSelect
         textEmail.text = emailAddress
 
     }
+
+
 }
