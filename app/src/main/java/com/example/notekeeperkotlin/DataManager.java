@@ -39,7 +39,8 @@ public class DataManager {
                 null,
                 null,
                 null,
-                null);
+                NoteKeeperDatabaseContract.CourseInfoEntry.COLUMN_COURSE_TITLE
+        );
 
         loadCourses(courseCursor);
 
@@ -50,7 +51,8 @@ public class DataManager {
                 null,
                 null,
                 null,
-                null);
+                NoteKeeperDatabaseContract.NoteInfoEntry.COLUMN_COURSE_ID
+                        + "," + NoteKeeperDatabaseContract.NoteInfoEntry.COLUMN_NOTE_TITLE);
 
         loadNotes(noteCursor);
 

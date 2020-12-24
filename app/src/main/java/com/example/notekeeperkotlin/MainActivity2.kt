@@ -65,12 +65,16 @@ class MainActivity2 : AppCompatActivity(), NavigationView.OnNavigationItemSelect
 
         return when (item.itemId) {
             R.id.nav_notes -> {
+                val notesFragment = NoteListFragment()
+                val fragmentTransaction = supportFragmentManager.beginTransaction()
+                fragmentTransaction.replace(R.id.nav_host_fragment, notesFragment).commit()
                 drawerLayout.closeDrawers()
                 true
             }
             R.id.nav_courses -> {
-                navController.navigate(R.id.action_NoteListFragment_to_coursesFragment)
-                handleSelection("Courses")
+                val coursesFragment = CoursesFragment()
+                val fragmentTransaction = supportFragmentManager.beginTransaction()
+                fragmentTransaction.replace(R.id.nav_host_fragment, coursesFragment).commit()
                 drawerLayout.closeDrawers()
                 true
             }

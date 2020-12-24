@@ -24,6 +24,7 @@ class NoteFragment : Fragment() {
     private var notePosition: Int = -1
     private var isCancelling: Boolean = false
     private var viewModel: NoteFragmentViewModel? = null
+    lateinit var dbOpenHelper: NoteKeeperOpenHelper
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -84,6 +85,7 @@ class NoteFragment : Fragment() {
 
         requireActivity().title = "Edit Note"
 
+        dbOpenHelper = NoteKeeperOpenHelper(context)
 
         val courses = DataManager.getInstance().courses
 
@@ -104,15 +106,17 @@ class NoteFragment : Fragment() {
         textNoteText = view.findViewById(R.id.text_note_text)
 
         if (!isNewNote) {
-            displayNote(spinnerCourses, textNoteTitle, textNoteText)
+            loadNoteData()
         }
     }
 
-    private fun displayNote(
-            spinnerCourses: Spinner?,
-            textNoteTitle: TextInputEditText?,
-            textNoteText: TextInputEditText?
-    ) {
+    private fun loadNoteData() {
+        val db = dbOpenHelper.readableDatabase
+
+
+    }
+
+    private fun displayNote() {
 
         val courses = DataManager.getInstance().courses
         val courseIndex = courses.indexOf(mNote!!.course)
@@ -166,7 +170,7 @@ class NoteFragment : Fragment() {
 
         saveOriginalNoteValues()
 
-        displayNote(spinnerCourses, textNoteTitle, textNoteText)
+        displayNote()
         requireActivity().invalidateOptionsMenu()
     }
 
@@ -216,5 +220,10 @@ class NoteFragment : Fragment() {
         super.onSaveInstanceState(outState)
 
         viewModel!!.saveState(outState)
+    }
+
+    override fun onDestroyView() {
+        dbOpenHelper.close()
+        super.onDestroyView()
     }
 }
