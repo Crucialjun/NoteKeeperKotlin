@@ -1,6 +1,7 @@
 package com.example.notekeeperkotlin
 
 import android.content.Intent
+import android.database.Cursor
 import android.os.Bundle
 import android.view.*
 import android.widget.ArrayAdapter
@@ -24,7 +25,11 @@ class NoteFragment : Fragment() {
     private var notePosition: Int = -1
     private var isCancelling: Boolean = false
     private var viewModel: NoteFragmentViewModel? = null
-    lateinit var dbOpenHelper: NoteKeeperOpenHelper
+    private lateinit var dbOpenHelper: NoteKeeperOpenHelper
+    private var noteCursor: Cursor? = null
+    private var noteTextPos: Int = 0
+    private var noteTitlePos: Int = 0
+    private var courseIDPos: Int = 0
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -113,16 +118,62 @@ class NoteFragment : Fragment() {
     private fun loadNoteData() {
         val db = dbOpenHelper.readableDatabase
 
+        val courseId = "android_intents"
+        val titleStart = "dynamic"
+
+        val selection =
+            "${NoteKeeperDatabaseContract.NoteInfoEntry.COLUMN_COURSE_ID} = ? AND ${NoteKeeperDatabaseContract.NoteInfoEntry.COLUMN_NOTE_TITLE} LIKE ?"
+
+        val selectionArgs = arrayOf(courseId, titleStart)
+
+
+        val noteColumns = arrayOf(
+            NoteKeeperDatabaseContract.NoteInfoEntry.COLUMN_COURSE_ID,
+            NoteKeeperDatabaseContract.NoteInfoEntry.COLUMN_NOTE_TITLE,
+            NoteKeeperDatabaseContract.NoteInfoEntry.COLUMN_NOTE_TEXT
+        )
+
+
+        noteCursor = db.query(
+            NoteKeeperDatabaseContract.NoteInfoEntry.TABLE_NAME,
+            noteColumns,
+            selection,
+            selectionArgs,
+            null,
+            null,
+            null
+        )
+
+
+
+        courseIDPos =
+            noteCursor!!.getColumnIndex(NoteKeeperDatabaseContract.NoteInfoEntry.COLUMN_COURSE_ID)
+
+        noteTitlePos =
+            noteCursor!!.getColumnIndex(NoteKeeperDatabaseContract.NoteInfoEntry.COLUMN_NOTE_TEXT)
+
+        noteTextPos =
+            noteCursor!!.getColumnIndex(NoteKeeperDatabaseContract.NoteInfoEntry.COLUMN_NOTE_TEXT)
+
+        noteCursor!!.moveToNext()
+        displayNote()
+
 
     }
 
     private fun displayNote() {
 
+        val courseId = noteCursor!!.getString(courseIDPos)
+        val noteTitle = noteCursor!!.getString(noteTitlePos)
+        val noteText = noteCursor!!.getString(noteTextPos)
+
         val courses = DataManager.getInstance().courses
-        val courseIndex = courses.indexOf(mNote!!.course)
+        val courseInfo = DataManager.getInstance().getCourse(courseId)
+        val courseIndex = courses.indexOf(courseInfo)
         spinnerCourses!!.setSelection(courseIndex)
-        textNoteTitle!!.setText(mNote!!.title)
-        textNoteText!!.setText(mNote!!.text)
+
+        textNoteTitle!!.setText(noteTitle)
+        textNoteText!!.setText(noteText)
     }
 
 
