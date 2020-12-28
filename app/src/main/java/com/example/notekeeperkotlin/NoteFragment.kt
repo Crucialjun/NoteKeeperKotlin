@@ -26,7 +26,7 @@ class NoteFragment : Fragment() {
     private var isCancelling: Boolean = false
     private var viewModel: NoteFragmentViewModel? = null
     private lateinit var dbOpenHelper: NoteKeeperOpenHelper
-    private var noteCursor: Cursor? = null
+    private lateinit var noteCursor: Cursor
     private var noteTextPos: Int = 0
     private var noteTitlePos: Int = 0
     private var courseIDPos: Int = 0
@@ -54,6 +54,7 @@ class NoteFragment : Fragment() {
         readDisplayStateValues()
         saveOriginalNoteValues()
 
+        dbOpenHelper = NoteKeeperOpenHelper(context)
         return view
     }
 
@@ -90,7 +91,7 @@ class NoteFragment : Fragment() {
 
         requireActivity().title = "Edit Note"
 
-        dbOpenHelper = NoteKeeperOpenHelper(context)
+
 
         val courses = DataManager.getInstance().courses
 
@@ -133,7 +134,6 @@ class NoteFragment : Fragment() {
             NoteKeeperDatabaseContract.NoteInfoEntry.COLUMN_NOTE_TEXT
         )
 
-
         noteCursor = db.query(
             NoteKeeperDatabaseContract.NoteInfoEntry.TABLE_NAME,
             noteColumns,
@@ -147,15 +147,15 @@ class NoteFragment : Fragment() {
 
 
         courseIDPos =
-            noteCursor!!.getColumnIndex(NoteKeeperDatabaseContract.NoteInfoEntry.COLUMN_COURSE_ID)
+            noteCursor.getColumnIndex(NoteKeeperDatabaseContract.NoteInfoEntry.COLUMN_COURSE_ID)
 
         noteTitlePos =
-            noteCursor!!.getColumnIndex(NoteKeeperDatabaseContract.NoteInfoEntry.COLUMN_NOTE_TEXT)
+            noteCursor.getColumnIndex(NoteKeeperDatabaseContract.NoteInfoEntry.COLUMN_NOTE_TEXT)
 
         noteTextPos =
-            noteCursor!!.getColumnIndex(NoteKeeperDatabaseContract.NoteInfoEntry.COLUMN_NOTE_TEXT)
+            noteCursor.getColumnIndex(NoteKeeperDatabaseContract.NoteInfoEntry.COLUMN_NOTE_TEXT)
 
-        noteCursor!!.moveToNext()
+        noteCursor.moveToNext()
         displayNote()
 
 
@@ -163,9 +163,9 @@ class NoteFragment : Fragment() {
 
     private fun displayNote() {
 
-        val courseId = noteCursor!!.getString(courseIDPos)
-        val noteTitle = noteCursor!!.getString(noteTitlePos)
-        val noteText = noteCursor!!.getString(noteTextPos)
+        val courseId = noteCursor.getString(courseIDPos)
+        val noteTitle = noteCursor.getString(noteTitlePos)
+        val noteText = noteCursor.getString(noteTextPos)
 
         val courses = DataManager.getInstance().courses
         val courseInfo = DataManager.getInstance().getCourse(courseId)
