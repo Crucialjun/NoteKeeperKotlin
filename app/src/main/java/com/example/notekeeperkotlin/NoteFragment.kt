@@ -4,7 +4,7 @@ import android.content.Intent
 import android.database.Cursor
 import android.os.Bundle
 import android.view.*
-import android.widget.ArrayAdapter
+import android.widget.SimpleCursorAdapter
 import android.widget.Spinner
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -16,7 +16,7 @@ import com.google.android.material.textfield.TextInputEditText
  */
 class NoteFragment : Fragment() {
 
-    private var position = -1
+    private var noteId = -1
     private var isNewNote = true
     private var mNote: NoteInfo? = null
     private var spinnerCourses: Spinner? = null
@@ -30,6 +30,7 @@ class NoteFragment : Fragment() {
     private var noteTextPos: Int = 0
     private var noteTitlePos: Int = 0
     private var courseIDPos: Int = 0
+    private lateinit var adapterCourses: SimpleCursorAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -52,7 +53,7 @@ class NoteFragment : Fragment() {
         viewModel!!.isNewlyCreated = false
         setHasOptionsMenu(true)
         readDisplayStateValues()
-        saveOriginalNoteValues()
+        //saveOriginalNoteValues()
 
         dbOpenHelper = NoteKeeperOpenHelper(context)
         return view
@@ -71,12 +72,12 @@ class NoteFragment : Fragment() {
 
     private fun readDisplayStateValues() {
         val args = NoteFragmentArgs.fromBundle(requireArguments())
-        position = args.notePosition
-        isNewNote = position == -1
+        noteId = args.notePosition
+        isNewNote = noteId == -1
         if (isNewNote) {
             createNewNote()
         } else {
-            mNote = DataManager.getInstance().notes[position]
+            //mNote = DataManager.getInstance().notes[noteId]
         }
     }
 
@@ -92,11 +93,17 @@ class NoteFragment : Fragment() {
         requireActivity().title = "Edit Note"
 
 
+        //val courses = DataManager.getInstance().courses
 
-        val courses = DataManager.getInstance().courses
 
-        val adapterCourses =
-                ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, courses)
+        adapterCourses = SimpleCursorAdapter(
+            requireContext(),
+            android.R.layout.simple_spinner_item,
+            null,
+            arrayOf(NoteKeeperDatabaseContract.CourseInfoEntry.COLUMN_COURSE_TITLE),
+            intArrayOf(android.R.id.text1),
+            0
+        )
 
         adapterCourses.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
 
@@ -104,6 +111,8 @@ class NoteFragment : Fragment() {
         spinnerCourses = view.findViewById(R.id.spinner_courses)
 
         spinnerCourses!!.adapter = adapterCourses
+
+        loadCourseData()
 
 
 
@@ -116,16 +125,36 @@ class NoteFragment : Fragment() {
         }
     }
 
+    private fun loadCourseData() {
+        val db = dbOpenHelper.readableDatabase
+        val courseColumns = arrayOf(
+            NoteKeeperDatabaseContract.CourseInfoEntry.COLUMN_COURSE_TITLE,
+            NoteKeeperDatabaseContract.CourseInfoEntry.COLUMN_COURSE_ID,
+            NoteKeeperDatabaseContract.CourseInfoEntry._ID
+        )
+        val cursor = db.query(
+            NoteKeeperDatabaseContract.CourseInfoEntry.TABLE_NAME, courseColumns,
+            null,
+            null,
+            null,
+            null,
+            NoteKeeperDatabaseContract.CourseInfoEntry.COLUMN_COURSE_TITLE
+        )
+
+        adapterCourses.changeCursor(cursor)
+
+
+    }
+
     private fun loadNoteData() {
         val db = dbOpenHelper.readableDatabase
 
         val courseId = "android_intents"
         val titleStart = "dynamic"
 
-        val selection =
-            "${NoteKeeperDatabaseContract.NoteInfoEntry.COLUMN_COURSE_ID} = ? AND ${NoteKeeperDatabaseContract.NoteInfoEntry.COLUMN_NOTE_TITLE} LIKE ?"
+        val selection = "${NoteKeeperDatabaseContract.NoteInfoEntry._ID} = ?"
 
-        val selectionArgs = arrayOf(courseId, titleStart)
+        val selectionArgs = arrayOf(noteId.toString())
 
 
         val noteColumns = arrayOf(
@@ -146,11 +175,15 @@ class NoteFragment : Fragment() {
 
 
 
+
+
+
+
         courseIDPos =
             noteCursor.getColumnIndex(NoteKeeperDatabaseContract.NoteInfoEntry.COLUMN_COURSE_ID)
 
         noteTitlePos =
-            noteCursor.getColumnIndex(NoteKeeperDatabaseContract.NoteInfoEntry.COLUMN_NOTE_TEXT)
+            noteCursor.getColumnIndex(NoteKeeperDatabaseContract.NoteInfoEntry.COLUMN_NOTE_TITLE)
 
         noteTextPos =
             noteCursor.getColumnIndex(NoteKeeperDatabaseContract.NoteInfoEntry.COLUMN_NOTE_TEXT)
@@ -167,13 +200,32 @@ class NoteFragment : Fragment() {
         val noteTitle = noteCursor.getString(noteTitlePos)
         val noteText = noteCursor.getString(noteTextPos)
 
-        val courses = DataManager.getInstance().courses
-        val courseInfo = DataManager.getInstance().getCourse(courseId)
-        val courseIndex = courses.indexOf(courseInfo)
+
+        val courseIndex = getIndexOfCourse(courseId)
         spinnerCourses!!.setSelection(courseIndex)
 
         textNoteTitle!!.setText(noteTitle)
         textNoteText!!.setText(noteText)
+    }
+
+    private fun getIndexOfCourse(courseId: String?): Int {
+        val cursor = adapterCourses.cursor
+        val courseIdPos =
+            cursor.getColumnIndex(NoteKeeperDatabaseContract.CourseInfoEntry.COLUMN_COURSE_ID)
+        var courseRow = 0
+
+        var more = cursor.moveToFirst()
+        while (more) {
+            val cursorCourseId = cursor.getString(courseIdPos)
+            if (cursorCourseId == courseId) {
+                break
+            } else {
+                courseRow += 1
+                more = cursor.moveToNext()
+            }
+        }
+
+        return courseRow
     }
 
 
@@ -208,7 +260,7 @@ class NoteFragment : Fragment() {
     override fun onPrepareOptionsMenu(menu: Menu) {
         val item = menu.findItem(R.id.action_next)
         val lastNoteIndex = DataManager.getInstance().notes.size - 1
-        item.isEnabled = position < lastNoteIndex
+        item.isEnabled = noteId < lastNoteIndex
         super.onPrepareOptionsMenu(menu)
     }
 
@@ -216,8 +268,8 @@ class NoteFragment : Fragment() {
         saveNote()
 
 
-        position += 1
-        mNote = DataManager.getInstance().notes[position]
+        noteId += 1
+        mNote = DataManager.getInstance().notes[noteId]
 
         saveOriginalNoteValues()
 

@@ -1,6 +1,7 @@
 package com.example.notekeeperkotlin
 
 import android.content.Context
+import android.database.Cursor
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,15 +9,30 @@ import android.widget.TextView
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 
-class NoteRecyclerAdapter(context: Context, private val notes: List<NoteInfo>) :
+class NoteRecyclerAdapter(context: Context, private var cursor: Cursor) :
     RecyclerView.Adapter<NoteRecyclerAdapter.ViewHolder>() {
 
     private val layoutInflater: LayoutInflater = LayoutInflater.from(context)
 
+    init {
+        populateColumnPositions()
+    }
+
+    private fun populateColumnPositions() {
+        //Get Columns Indexs
+    }
+
+    private fun changeCursor(newCursor: Cursor) {
+        cursor.close()
+        cursor = newCursor
+        populateColumnPositions()
+        notifyDataSetChanged()
+    }
+
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
         val textCourse: TextView = itemView.findViewById(R.id.text_course)
         val textTitle: TextView = itemView.findViewById(R.id.text_title)
-        var currentPosition = -1
+        var id = -1
 
         init {
             itemView.setOnClickListener(this)
@@ -24,7 +40,7 @@ class NoteRecyclerAdapter(context: Context, private val notes: List<NoteInfo>) :
 
         override fun onClick(p0: View?) {
             val action =
-                NoteListFragmentDirections.actionSecondFragmentToFirstFragment(currentPosition)
+                NoteListFragmentDirections.actionSecondFragmentToFirstFragment(id)
             p0!!.findNavController().navigate(action)
         }
 
@@ -40,7 +56,7 @@ class NoteRecyclerAdapter(context: Context, private val notes: List<NoteInfo>) :
         val note = notes[position]
         holder.textCourse.text = note.course.title
         holder.textTitle.text = note.title
-        holder.currentPosition = position
+        holder.id = note.id
 
     }
 
