@@ -9,7 +9,7 @@ import android.widget.TextView
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 
-class NoteRecyclerAdapter(context: Context, private var cursor: Cursor) :
+class NoteRecyclerAdapter(context: Context, private var cursor: Cursor?) :
     RecyclerView.Adapter<NoteRecyclerAdapter.ViewHolder>() {
 
     private val layoutInflater: LayoutInflater = LayoutInflater.from(context)
@@ -24,17 +24,25 @@ class NoteRecyclerAdapter(context: Context, private var cursor: Cursor) :
     private fun populateColumnPositions() {
         //Get Columns Indexs
 
-        coursePos = cursor.getColumnIndex(NoteKeeperDatabaseContract.NoteInfoEntry.COLUMN_COURSE_ID)
-        noteTitlePos =
-            cursor.getColumnIndex(NoteKeeperDatabaseContract.NoteInfoEntry.COLUMN_NOTE_TITLE)
-        idPos = cursor.getColumnIndex(NoteKeeperDatabaseContract.NoteInfoEntry._ID)
+        if (cursor == null) {
+            return
+        } else {
+            coursePos =
+                cursor!!.getColumnIndex(NoteKeeperDatabaseContract.NoteInfoEntry.COLUMN_COURSE_ID)
+            noteTitlePos =
+                cursor!!.getColumnIndex(NoteKeeperDatabaseContract.NoteInfoEntry.COLUMN_NOTE_TITLE)
+            idPos = cursor!!.getColumnIndex(NoteKeeperDatabaseContract.NoteInfoEntry._ID)
+        }
     }
 
-    private fun changeCursor(newCursor: Cursor) {
-        cursor.close()
-        cursor = newCursor
-        populateColumnPositions()
-        notifyDataSetChanged()
+    fun changeCursor(newCursor: Cursor) {
+        if (cursor == null) {
+            cursor?.close()
+        } else {
+            cursor = newCursor
+            populateColumnPositions()
+            notifyDataSetChanged()
+        }
     }
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
@@ -61,10 +69,10 @@ class NoteRecyclerAdapter(context: Context, private var cursor: Cursor) :
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        cursor.moveToPosition(position)
-        val course = cursor.getString(coursePos)
-        val noteTitle = cursor.getString(noteTitlePos)
-        val id = cursor.getInt(idPos)
+        cursor!!.moveToPosition(position)
+        val course = cursor!!.getString(coursePos)
+        val noteTitle = cursor!!.getString(noteTitlePos)
+        val id = cursor!!.getInt(idPos)
 
         holder.textCourse.text = course
         holder.textTitle.text = noteTitle
@@ -73,6 +81,10 @@ class NoteRecyclerAdapter(context: Context, private var cursor: Cursor) :
     }
 
     override fun getItemCount(): Int {
-        return cursor.count
+        return if (cursor != null) {
+            cursor!!.count
+        } else {
+            0
+        }
     }
 }

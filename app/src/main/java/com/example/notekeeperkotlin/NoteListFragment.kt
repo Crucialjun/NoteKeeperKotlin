@@ -1,5 +1,6 @@
 package com.example.notekeeperkotlin
 
+import android.database.Cursor
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -16,6 +17,8 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 class NoteListFragment : Fragment() {
 
     private lateinit var dbOpenHelper: NoteKeeperOpenHelper
+    lateinit var noteRecyclerAdapter: NoteRecyclerAdapter
+    var noteCursor: Cursor? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -65,8 +68,27 @@ class NoteListFragment : Fragment() {
         notesList.layoutManager = notesLayoutManager
 
 
-        val notes = DataManager.getInstance().notes
-        val noteRecyclerAdapter = NoteRecyclerAdapter(requireContext(), notes)
+        val db = dbOpenHelper.readableDatabase
+
+        val noteColumns = arrayOf(
+            NoteKeeperDatabaseContract.NoteInfoEntry.COLUMN_NOTE_TITLE,
+            NoteKeeperDatabaseContract.NoteInfoEntry.COLUMN_COURSE_ID,
+            NoteKeeperDatabaseContract.NoteInfoEntry._ID
+        )
+
+
+        noteCursor = db.query(
+            NoteKeeperDatabaseContract.NoteInfoEntry.TABLE_NAME,
+            noteColumns,
+            null,
+            null,
+            null,
+            null,
+            NoteKeeperDatabaseContract.NoteInfoEntry.COLUMN_COURSE_ID
+                    + "," + NoteKeeperDatabaseContract.NoteInfoEntry.COLUMN_NOTE_TITLE
+        )
+
+        noteRecyclerAdapter = NoteRecyclerAdapter(requireContext(), noteCursor)
         notesList.adapter = noteRecyclerAdapter
 
 
@@ -75,5 +97,35 @@ class NoteListFragment : Fragment() {
     override fun onDestroyView() {
         dbOpenHelper.close()
         super.onDestroyView()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        loadNotes()
+    }
+
+    private fun loadNotes() {
+        val db = dbOpenHelper.readableDatabase
+
+        val noteColumns = arrayOf(
+            NoteKeeperDatabaseContract.NoteInfoEntry.COLUMN_NOTE_TITLE,
+            NoteKeeperDatabaseContract.NoteInfoEntry.COLUMN_COURSE_ID,
+            NoteKeeperDatabaseContract.NoteInfoEntry._ID
+        )
+
+        val noteCursor = db.query(
+            NoteKeeperDatabaseContract.NoteInfoEntry.TABLE_NAME,
+            noteColumns,
+            null,
+            null,
+            null,
+            null,
+            NoteKeeperDatabaseContract.NoteInfoEntry.COLUMN_COURSE_ID
+                    + "," + NoteKeeperDatabaseContract.NoteInfoEntry.COLUMN_NOTE_TITLE
+        )
+
+        noteRecyclerAdapter.changeCursor(noteCursor)
+
+
     }
 }
