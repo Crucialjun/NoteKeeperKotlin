@@ -2,12 +2,12 @@ package com.example.notekeeperkotlin
 
 import android.content.Context
 import android.database.Cursor
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.TextView
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
+import com.example.notekeeperkotlin.NoteKeeperDatabaseContract.CourseInfoEntry
+import com.example.notekeeperkotlin.NoteKeeperDatabaseContract.NoteInfoEntry
 
 class NoteRecyclerAdapter(context: Context, private var cursor: Cursor?) :
     RecyclerView.Adapter<NoteRecyclerAdapter.ViewHolder>() {
@@ -28,14 +28,14 @@ class NoteRecyclerAdapter(context: Context, private var cursor: Cursor?) :
             return
         } else {
             coursePos =
-                cursor!!.getColumnIndex(NoteKeeperDatabaseContract.NoteInfoEntry.COLUMN_COURSE_ID)
+                cursor!!.getColumnIndex(CourseInfoEntry.COLUMN_COURSE_TITLE)
             noteTitlePos =
-                cursor!!.getColumnIndex(NoteKeeperDatabaseContract.NoteInfoEntry.COLUMN_NOTE_TITLE)
-            idPos = cursor!!.getColumnIndex(NoteKeeperDatabaseContract.NoteInfoEntry._ID)
+                cursor!!.getColumnIndex(NoteInfoEntry.COLUMN_NOTE_TITLE)
+            idPos = cursor!!.getColumnIndex(NoteInfoEntry._ID)
         }
     }
 
-    fun changeCursor(newCursor: Cursor) {
+    fun changeCursor(newCursor: Cursor?) {
         if (cursor == null) {
             cursor?.close()
         } else {

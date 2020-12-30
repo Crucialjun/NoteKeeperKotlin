@@ -8,13 +8,16 @@ import android.widget.SimpleCursorAdapter
 import android.widget.Spinner
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.loader.app.LoaderManager
+import androidx.loader.content.CursorLoader
+import androidx.loader.content.Loader
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.textfield.TextInputEditText
 
 /**
  * A simple [Fragment] subclass as the default destination in the navigation.
  */
-class NoteFragment : Fragment() {
+class NoteFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor> {
 
     private var noteId = -1
     private var isNewNote = true
@@ -31,6 +34,10 @@ class NoteFragment : Fragment() {
     private var noteTitlePos: Int = 0
     private var courseIDPos: Int = 0
     private lateinit var adapterCourses: SimpleCursorAdapter
+    private val LOADER_NOTES = 0
+    private val LOADER_COURSES = 1
+    var coursesQueryFinished = false
+    var notessQueryFinished = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -53,7 +60,7 @@ class NoteFragment : Fragment() {
         viewModel!!.isNewlyCreated = false
         setHasOptionsMenu(true)
         readDisplayStateValues()
-        //saveOriginalNoteValues()
+        saveOriginalNoteValues()
 
         dbOpenHelper = NoteKeeperOpenHelper(context)
         return view
@@ -63,9 +70,9 @@ class NoteFragment : Fragment() {
         if (isNewNote) {
             return
         } else {
-            viewModel!!.originalNoteCourseID = mNote!!.course.courseId
-            viewModel!!.originalNoteTitle = mNote!!.title
-            viewModel!!.originalNoteText = mNote!!.text
+            viewModel?.originalNoteCourseID = mNote?.course?.courseId.toString()
+            viewModel?.originalNoteTitle = mNote?.title.toString()
+            viewModel?.originalNoteText = mNote?.text.toString()
 
         }
     }
@@ -112,8 +119,8 @@ class NoteFragment : Fragment() {
 
         spinnerCourses!!.adapter = adapterCourses
 
-        loadCourseData()
-
+        loaderManager.initLoader(LOADER_COURSES, null, this)
+        //loadCourseData()
 
 
         textNoteTitle = view.findViewById(R.id.text_note_title)
@@ -121,7 +128,8 @@ class NoteFragment : Fragment() {
         textNoteText = view.findViewById(R.id.text_note_text)
 
         if (!isNewNote) {
-            loadNoteData()
+            //loadNoteData()
+            loaderManager.initLoader(LOADER_NOTES, null, this)
         }
     }
 
@@ -172,9 +180,6 @@ class NoteFragment : Fragment() {
             null,
             null
         )
-
-
-
 
 
 
@@ -313,9 +318,9 @@ class NoteFragment : Fragment() {
     }
 
     private fun saveNote() {
-        mNote!!.course = spinnerCourses!!.selectedItem as CourseInfo?
-        mNote!!.title = textNoteTitle!!.text.toString()
-        mNote!!.text = textNoteText!!.text.toString()
+        mNote?.course = spinnerCourses!!.selectedItem as CourseInfo?
+        mNote?.title = textNoteTitle!!.text.toString()
+        mNote?.text = textNoteText!!.text.toString()
 
     }
 
@@ -328,5 +333,109 @@ class NoteFragment : Fragment() {
     override fun onDestroyView() {
         dbOpenHelper.close()
         super.onDestroyView()
+    }
+
+    override fun onCreateLoader(id: Int, args: Bundle?): Loader<Cursor> {
+        var loader: CursorLoader? = null
+        if (id == LOADER_NOTES) {
+            loader = createLoaderNotes()
+        } else if (id == LOADER_COURSES) {
+            loader = createLoaderCourses()
+        }
+        return loader as Loader<Cursor>
+
+    }
+
+    private fun createLoaderCourses(): CursorLoader {
+        coursesQueryFinished = false
+        return object : CursorLoader(requireContext()) {
+            override fun loadInBackground(): Cursor? {
+                val db = dbOpenHelper.readableDatabase
+                val courseColumns = arrayOf(
+                    NoteKeeperDatabaseContract.CourseInfoEntry.COLUMN_COURSE_TITLE,
+                    NoteKeeperDatabaseContract.CourseInfoEntry.COLUMN_COURSE_ID,
+                    NoteKeeperDatabaseContract.CourseInfoEntry._ID
+                )
+                return db.query(
+                    NoteKeeperDatabaseContract.CourseInfoEntry.TABLE_NAME, courseColumns,
+                    null,
+                    null,
+                    null,
+                    null,
+                    NoteKeeperDatabaseContract.CourseInfoEntry.COLUMN_COURSE_TITLE
+                )
+            }
+        }
+    }
+
+    private fun createLoaderNotes(): CursorLoader {
+        notessQueryFinished = false
+        return object : CursorLoader(requireContext()) {
+            override fun loadInBackground(): Cursor? {
+                val db = dbOpenHelper.readableDatabase
+
+                val selection = "${NoteKeeperDatabaseContract.NoteInfoEntry._ID} = ?"
+
+                val selectionArgs = arrayOf(noteId.toString())
+
+
+                val noteColumns = arrayOf(
+                    NoteKeeperDatabaseContract.NoteInfoEntry.COLUMN_COURSE_ID,
+                    NoteKeeperDatabaseContract.NoteInfoEntry.COLUMN_NOTE_TITLE,
+                    NoteKeeperDatabaseContract.NoteInfoEntry.COLUMN_NOTE_TEXT
+                )
+
+                return db.query(
+                    NoteKeeperDatabaseContract.NoteInfoEntry.TABLE_NAME,
+                    noteColumns,
+                    selection,
+                    selectionArgs,
+                    null,
+                    null,
+                    null
+                )
+            }
+        }
+    }
+
+    override fun onLoadFinished(loader: Loader<Cursor>, data: Cursor?) {
+        if (loader.id == LOADER_NOTES) {
+            loadFinishedNotes(data)
+        } else if (loader.id == LOADER_COURSES) {
+            adapterCourses.changeCursor(data)
+            coursesQueryFinished = true
+            displayNotesWhenQueryFinished()
+        }
+    }
+
+    private fun loadFinishedNotes(data: Cursor?) {
+        noteCursor = data!!
+        courseIDPos =
+            noteCursor.getColumnIndex(NoteKeeperDatabaseContract.NoteInfoEntry.COLUMN_COURSE_ID)
+
+        noteTitlePos =
+            noteCursor.getColumnIndex(NoteKeeperDatabaseContract.NoteInfoEntry.COLUMN_NOTE_TITLE)
+
+        noteTextPos =
+            noteCursor.getColumnIndex(NoteKeeperDatabaseContract.NoteInfoEntry.COLUMN_NOTE_TEXT)
+
+        noteCursor.moveToNext()
+        notessQueryFinished = true
+        displayNotesWhenQueryFinished()
+
+
+    }
+
+    private fun displayNotesWhenQueryFinished() {
+        if (notessQueryFinished && coursesQueryFinished)
+            displayNote()
+    }
+
+    override fun onLoaderReset(loader: Loader<Cursor>) {
+        if (loader.id == LOADER_NOTES) {
+            noteCursor.close()
+        } else if (loader.id == LOADER_COURSES) {
+            adapterCourses.changeCursor(null)
+        }
     }
 }
