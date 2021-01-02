@@ -1,5 +1,6 @@
 package com.example.notekeeperkotlin
 
+import android.content.ContentValues
 import android.content.Intent
 import android.database.Cursor
 import android.os.Bundle
@@ -322,6 +323,24 @@ class NoteFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor> {
         mNote?.title = textNoteTitle!!.text.toString()
         mNote?.text = textNoteText!!.text.toString()
 
+    }
+
+    private fun saveNoteToSqDatabase(courseId: String, noteTitle: String, noteText: String) {
+        val selection = "${NoteKeeperDatabaseContract.NoteInfoEntry._ID} = ?"
+        val selectionArgs = arrayOf(noteId.toString())
+
+        val values = ContentValues()
+        values.put(NoteKeeperDatabaseContract.NoteInfoEntry.COLUMN_COURSE_ID, courseId)
+        values.put(NoteKeeperDatabaseContract.NoteInfoEntry.COLUMN_NOTE_TITLE, noteTitle)
+        values.put(NoteKeeperDatabaseContract.NoteInfoEntry.COLUMN_NOTE_TEXT, noteText)
+
+        val db = dbOpenHelper.writableDatabase
+        db.update(
+            NoteKeeperDatabaseContract.NoteInfoEntry.TABLE_NAME,
+            values,
+            selection,
+            selectionArgs
+        )
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
