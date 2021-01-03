@@ -37,8 +37,8 @@ class NoteFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor> {
     private lateinit var adapterCourses: SimpleCursorAdapter
     private val LOADER_NOTES = 0
     private val LOADER_COURSES = 1
-    var coursesQueryFinished = false
-    var notessQueryFinished = false
+    private var coursesQueryFinished = false
+    private var notessQueryFinished = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -319,15 +319,30 @@ class NoteFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor> {
     }
 
     private fun saveNote() {
-        mNote?.course = spinnerCourses!!.selectedItem as CourseInfo?
-        mNote?.title = textNoteTitle!!.text.toString()
-        mNote?.text = textNoteText!!.text.toString()
+        //mNote?.course = spinnerCourses!!.selectedItem as CourseInfo?
+        val noteTitle = textNoteTitle!!.text.toString()
+        val noteText = textNoteText!!.text.toString()
 
+        val courseId: String = selectedCourseId()
+
+        saveNoteToSqDatabase(courseId, noteTitle, noteText)
+
+    }
+
+    private fun selectedCourseId(): String {
+        val selectedPos = spinnerCourses!!.selectedItemPosition
+        val cursor = adapterCourses.cursor
+        cursor.moveToPosition(selectedPos)
+
+        val courseIdPos =
+            cursor.getColumnIndex(NoteKeeperDatabaseContract.CourseInfoEntry.COLUMN_COURSE_ID)
+
+        return cursor.getString(courseIdPos)
     }
 
     private fun saveNoteToSqDatabase(courseId: String, noteTitle: String, noteText: String) {
         val selection = "${NoteKeeperDatabaseContract.NoteInfoEntry._ID} = ?"
-        val selectionArgs = arrayOf(noteId.toString())
+        val selectionArgs = arrayOf("$noteId")
 
         val values = ContentValues()
         values.put(NoteKeeperDatabaseContract.NoteInfoEntry.COLUMN_COURSE_ID, courseId)
