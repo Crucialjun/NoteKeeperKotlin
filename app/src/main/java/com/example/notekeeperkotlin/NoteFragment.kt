@@ -59,11 +59,12 @@ class NoteFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor> {
         }
 
         viewModel!!.isNewlyCreated = false
+        dbOpenHelper = NoteKeeperOpenHelper(context)
         setHasOptionsMenu(true)
         readDisplayStateValues()
         saveOriginalNoteValues()
 
-        dbOpenHelper = NoteKeeperOpenHelper(context)
+
         return view
     }
 
@@ -90,9 +91,19 @@ class NoteFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor> {
     }
 
     private fun createNewNote() {
-        val dm = DataManager.getInstance()
-        notePosition = dm.createNewNote()
-        mNote = dm.notes[notePosition]
+//        val dm = DataManager.getInstance()
+//        notePosition = dm.createNewNote()
+//        mNote = dm.notes[notePosition]
+
+        val values = ContentValues()
+
+        values.put(NoteKeeperDatabaseContract.NoteInfoEntry.COLUMN_COURSE_ID, "")
+        values.put(NoteKeeperDatabaseContract.NoteInfoEntry.COLUMN_NOTE_TITLE, "")
+        values.put(NoteKeeperDatabaseContract.NoteInfoEntry.COLUMN_NOTE_TEXT, "")
+
+        val db = dbOpenHelper.writableDatabase
+        noteId =
+            db.insert(NoteKeeperDatabaseContract.NoteInfoEntry.TABLE_NAME, null, values).toInt()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -301,13 +312,21 @@ class NoteFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor> {
         super.onPause()
         if (isCancelling) {
             if (isNewNote) {
-                DataManager.getInstance().removeNote(notePosition)
+                //DataManager.getInstance().removeNote(notePosition)
+                deleteFromSqDatabase()
             } else {
                 storePreviousNotevalues()
             }
         } else {
             saveNote()
         }
+    }
+
+    private fun deleteFromSqDatabase() {
+        val selection = "${NoteKeeperDatabaseContract.NoteInfoEntry._ID} = ?"
+        val selectionArgs = arrayOf(noteId.toString())
+        val db = dbOpenHelper.writableDatabase
+        db.delete(NoteKeeperDatabaseContract.NoteInfoEntry.TABLE_NAME, selection, selectionArgs)
     }
 
     private fun storePreviousNotevalues() {
