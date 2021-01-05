@@ -9,11 +9,13 @@ import android.widget.SimpleCursorAdapter
 import android.widget.Spinner
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.loader.app.LoaderManager
 import androidx.loader.content.CursorLoader
 import androidx.loader.content.Loader
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.textfield.TextInputEditText
+import kotlinx.coroutines.launch
 
 /**
  * A simple [Fragment] subclass as the default destination in the navigation.
@@ -325,8 +327,12 @@ class NoteFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor> {
     private fun deleteFromSqDatabase() {
         val selection = "${NoteKeeperDatabaseContract.NoteInfoEntry._ID} = ?"
         val selectionArgs = arrayOf(noteId.toString())
-        val db = dbOpenHelper.writableDatabase
-        db.delete(NoteKeeperDatabaseContract.NoteInfoEntry.TABLE_NAME, selection, selectionArgs)
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            val db = dbOpenHelper.writableDatabase
+            db.delete(NoteKeeperDatabaseContract.NoteInfoEntry.TABLE_NAME, selection, selectionArgs)
+        }
+
     }
 
     private fun storePreviousNotevalues() {
