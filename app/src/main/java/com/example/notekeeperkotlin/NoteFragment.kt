@@ -14,6 +14,8 @@ import androidx.loader.app.LoaderManager
 import androidx.loader.content.CursorLoader
 import androidx.loader.content.Loader
 import androidx.navigation.fragment.findNavController
+import com.example.notekeeperkotlin.NoteKeeperDatabaseContract.CourseInfoEntry
+import com.example.notekeeperkotlin.NoteKeeperDatabaseContract.NoteInfoEntry
 import com.google.android.material.textfield.TextInputEditText
 import kotlinx.coroutines.launch
 
@@ -99,13 +101,13 @@ class NoteFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor> {
 
         val values = ContentValues()
 
-        values.put(NoteKeeperDatabaseContract.NoteInfoEntry.COLUMN_COURSE_ID, "")
-        values.put(NoteKeeperDatabaseContract.NoteInfoEntry.COLUMN_NOTE_TITLE, "")
-        values.put(NoteKeeperDatabaseContract.NoteInfoEntry.COLUMN_NOTE_TEXT, "")
+        values.put(NoteInfoEntry.COLUMN_COURSE_ID, "")
+        values.put(NoteInfoEntry.COLUMN_NOTE_TITLE, "")
+        values.put(NoteInfoEntry.COLUMN_NOTE_TEXT, "")
 
         val db = dbOpenHelper.writableDatabase
         noteId =
-            db.insert(NoteKeeperDatabaseContract.NoteInfoEntry.TABLE_NAME, null, values).toInt()
+            db.insert(NoteInfoEntry.TABLE_NAME, null, values).toInt()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -121,7 +123,7 @@ class NoteFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor> {
             requireContext(),
             android.R.layout.simple_spinner_item,
             null,
-            arrayOf(NoteKeeperDatabaseContract.CourseInfoEntry.COLUMN_COURSE_TITLE),
+            arrayOf(CourseInfoEntry.COLUMN_COURSE_TITLE),
             intArrayOf(android.R.id.text1),
             0
         )
@@ -150,17 +152,17 @@ class NoteFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor> {
     private fun loadCourseData() {
         val db = dbOpenHelper.readableDatabase
         val courseColumns = arrayOf(
-            NoteKeeperDatabaseContract.CourseInfoEntry.COLUMN_COURSE_TITLE,
-            NoteKeeperDatabaseContract.CourseInfoEntry.COLUMN_COURSE_ID,
-            NoteKeeperDatabaseContract.CourseInfoEntry._ID
+            CourseInfoEntry.COLUMN_COURSE_TITLE,
+            CourseInfoEntry.COLUMN_COURSE_ID,
+            CourseInfoEntry._ID
         )
         val cursor = db.query(
-            NoteKeeperDatabaseContract.CourseInfoEntry.TABLE_NAME, courseColumns,
+            CourseInfoEntry.TABLE_NAME, courseColumns,
             null,
             null,
             null,
             null,
-            NoteKeeperDatabaseContract.CourseInfoEntry.COLUMN_COURSE_TITLE
+            CourseInfoEntry.COLUMN_COURSE_TITLE
         )
 
         adapterCourses.changeCursor(cursor)
@@ -174,19 +176,19 @@ class NoteFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor> {
         val courseId = "android_intents"
         val titleStart = "dynamic"
 
-        val selection = "${NoteKeeperDatabaseContract.NoteInfoEntry._ID} = ?"
+        val selection = "${NoteInfoEntry._ID} = ?"
 
         val selectionArgs = arrayOf(noteId.toString())
 
 
         val noteColumns = arrayOf(
-            NoteKeeperDatabaseContract.NoteInfoEntry.COLUMN_COURSE_ID,
-            NoteKeeperDatabaseContract.NoteInfoEntry.COLUMN_NOTE_TITLE,
-            NoteKeeperDatabaseContract.NoteInfoEntry.COLUMN_NOTE_TEXT
+            NoteInfoEntry.COLUMN_COURSE_ID,
+            NoteInfoEntry.COLUMN_NOTE_TITLE,
+            NoteInfoEntry.COLUMN_NOTE_TEXT
         )
 
         noteCursor = db.query(
-            NoteKeeperDatabaseContract.NoteInfoEntry.TABLE_NAME,
+            NoteInfoEntry.TABLE_NAME,
             noteColumns,
             selection,
             selectionArgs,
@@ -199,13 +201,13 @@ class NoteFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor> {
 
 
         courseIDPos =
-            noteCursor.getColumnIndex(NoteKeeperDatabaseContract.NoteInfoEntry.COLUMN_COURSE_ID)
+            noteCursor.getColumnIndex(NoteInfoEntry.COLUMN_COURSE_ID)
 
         noteTitlePos =
-            noteCursor.getColumnIndex(NoteKeeperDatabaseContract.NoteInfoEntry.COLUMN_NOTE_TITLE)
+            noteCursor.getColumnIndex(NoteInfoEntry.COLUMN_NOTE_TITLE)
 
         noteTextPos =
-            noteCursor.getColumnIndex(NoteKeeperDatabaseContract.NoteInfoEntry.COLUMN_NOTE_TEXT)
+            noteCursor.getColumnIndex(NoteInfoEntry.COLUMN_NOTE_TEXT)
 
         noteCursor.moveToNext()
         displayNote()
@@ -230,7 +232,7 @@ class NoteFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor> {
     private fun getIndexOfCourse(courseId: String?): Int {
         val cursor = adapterCourses.cursor
         val courseIdPos =
-            cursor.getColumnIndex(NoteKeeperDatabaseContract.CourseInfoEntry.COLUMN_COURSE_ID)
+            cursor.getColumnIndex(CourseInfoEntry.COLUMN_COURSE_ID)
         var courseRow = 0
 
         var more = cursor.moveToFirst()
@@ -325,12 +327,12 @@ class NoteFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor> {
     }
 
     private fun deleteFromSqDatabase() {
-        val selection = "${NoteKeeperDatabaseContract.NoteInfoEntry._ID} = ?"
+        val selection = "${NoteInfoEntry._ID} = ?"
         val selectionArgs = arrayOf(noteId.toString())
 
         viewLifecycleOwner.lifecycleScope.launch {
             val db = dbOpenHelper.writableDatabase
-            db.delete(NoteKeeperDatabaseContract.NoteInfoEntry.TABLE_NAME, selection, selectionArgs)
+            db.delete(NoteInfoEntry.TABLE_NAME, selection, selectionArgs)
         }
 
     }
@@ -360,23 +362,23 @@ class NoteFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor> {
         cursor.moveToPosition(selectedPos)
 
         val courseIdPos =
-            cursor.getColumnIndex(NoteKeeperDatabaseContract.CourseInfoEntry.COLUMN_COURSE_ID)
+            cursor.getColumnIndex(CourseInfoEntry.COLUMN_COURSE_ID)
 
         return cursor.getString(courseIdPos)
     }
 
     private fun saveNoteToSqDatabase(courseId: String, noteTitle: String, noteText: String) {
-        val selection = "${NoteKeeperDatabaseContract.NoteInfoEntry._ID} = ?"
+        val selection = "${NoteInfoEntry._ID} = ?"
         val selectionArgs = arrayOf("$noteId")
 
         val values = ContentValues()
-        values.put(NoteKeeperDatabaseContract.NoteInfoEntry.COLUMN_COURSE_ID, courseId)
-        values.put(NoteKeeperDatabaseContract.NoteInfoEntry.COLUMN_NOTE_TITLE, noteTitle)
-        values.put(NoteKeeperDatabaseContract.NoteInfoEntry.COLUMN_NOTE_TEXT, noteText)
+        values.put(NoteInfoEntry.COLUMN_COURSE_ID, courseId)
+        values.put(NoteInfoEntry.COLUMN_NOTE_TITLE, noteTitle)
+        values.put(NoteInfoEntry.COLUMN_NOTE_TEXT, noteText)
 
         val db = dbOpenHelper.writableDatabase
         db.update(
-            NoteKeeperDatabaseContract.NoteInfoEntry.TABLE_NAME,
+            NoteInfoEntry.TABLE_NAME,
             values,
             selection,
             selectionArgs
@@ -411,17 +413,17 @@ class NoteFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor> {
             override fun loadInBackground(): Cursor? {
                 val db = dbOpenHelper.readableDatabase
                 val courseColumns = arrayOf(
-                    NoteKeeperDatabaseContract.CourseInfoEntry.COLUMN_COURSE_TITLE,
-                    NoteKeeperDatabaseContract.CourseInfoEntry.COLUMN_COURSE_ID,
-                    NoteKeeperDatabaseContract.CourseInfoEntry._ID
+                    CourseInfoEntry.COLUMN_COURSE_TITLE,
+                    CourseInfoEntry.COLUMN_COURSE_ID,
+                    CourseInfoEntry._ID
                 )
                 return db.query(
-                    NoteKeeperDatabaseContract.CourseInfoEntry.TABLE_NAME, courseColumns,
+                    CourseInfoEntry.TABLE_NAME, courseColumns,
                     null,
                     null,
                     null,
                     null,
-                    NoteKeeperDatabaseContract.CourseInfoEntry.COLUMN_COURSE_TITLE
+                    CourseInfoEntry.COLUMN_COURSE_TITLE
                 )
             }
         }
@@ -433,19 +435,19 @@ class NoteFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor> {
             override fun loadInBackground(): Cursor? {
                 val db = dbOpenHelper.readableDatabase
 
-                val selection = "${NoteKeeperDatabaseContract.NoteInfoEntry._ID} = ?"
+                val selection = "${NoteInfoEntry._ID} = ?"
 
                 val selectionArgs = arrayOf(noteId.toString())
 
 
                 val noteColumns = arrayOf(
-                    NoteKeeperDatabaseContract.NoteInfoEntry.COLUMN_COURSE_ID,
-                    NoteKeeperDatabaseContract.NoteInfoEntry.COLUMN_NOTE_TITLE,
-                    NoteKeeperDatabaseContract.NoteInfoEntry.COLUMN_NOTE_TEXT
+                    NoteInfoEntry.COLUMN_COURSE_ID,
+                    NoteInfoEntry.COLUMN_NOTE_TITLE,
+                    NoteInfoEntry.COLUMN_NOTE_TEXT
                 )
 
                 return db.query(
-                    NoteKeeperDatabaseContract.NoteInfoEntry.TABLE_NAME,
+                    NoteInfoEntry.TABLE_NAME,
                     noteColumns,
                     selection,
                     selectionArgs,
@@ -470,13 +472,13 @@ class NoteFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor> {
     private fun loadFinishedNotes(data: Cursor?) {
         noteCursor = data!!
         courseIDPos =
-            noteCursor.getColumnIndex(NoteKeeperDatabaseContract.NoteInfoEntry.COLUMN_COURSE_ID)
+            noteCursor.getColumnIndex(NoteInfoEntry.COLUMN_COURSE_ID)
 
         noteTitlePos =
-            noteCursor.getColumnIndex(NoteKeeperDatabaseContract.NoteInfoEntry.COLUMN_NOTE_TITLE)
+            noteCursor.getColumnIndex(NoteInfoEntry.COLUMN_NOTE_TITLE)
 
         noteTextPos =
-            noteCursor.getColumnIndex(NoteKeeperDatabaseContract.NoteInfoEntry.COLUMN_NOTE_TEXT)
+            noteCursor.getColumnIndex(NoteInfoEntry.COLUMN_NOTE_TEXT)
 
         noteCursor.moveToNext()
         notessQueryFinished = true
