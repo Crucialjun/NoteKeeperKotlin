@@ -1,13 +1,26 @@
 package com.example.notekeeperkotlin
 
-import android.content.ContentProvider
-import android.content.ContentValues
+import android.content.*
 import android.database.Cursor
 import android.net.Uri
 
 class NoteKeeperProvider : ContentProvider() {
 
     lateinit var dbOpenHelper: NoteKeeperOpenHelper
+    val uriMatcher = UriMatcher(UriMatcher.NO_MATCH)
+
+    init {
+        uriMatcher.addURI(
+            NoteKeeperProviderContract.AUTHORITY,
+            NoteKeeperProviderContract.Courses.PATH,
+            0
+        )
+        uriMatcher.addURI(
+            NoteKeeperProviderContract.AUTHORITY,
+            NoteKeeperProviderContract.Notes.PATH,
+            1
+        )
+    }
 
     override fun delete(uri: Uri, selection: String?, selectionArgs: Array<String>?): Int {
         TODO("Implement this to handle requests to delete one or more rows")
@@ -35,15 +48,36 @@ class NoteKeeperProvider : ContentProvider() {
     ): Cursor? {
         var cursor: Cursor? = null
         val db = dbOpenHelper.readableDatabase
-        cursor = db.query(
-            NoteKeeperDatabaseContract.CourseInfoEntry.TABLE_NAME,
-            projection,
-            selection,
-            selectionArgs,
-            null,
-            null,
-            sortOrder
-        )
+
+        val uriMatch = uriMatcher.match(uri)
+
+        when (uriMatch) {
+            0 -> {
+
+                cursor = db.query(
+                    NoteKeeperDatabaseContract.CourseInfoEntry.TABLE_NAME,
+                    projection,
+                    selection,
+                    selectionArgs,
+                    null,
+                    null,
+                    sortOrder
+                )
+
+            }
+            1 -> {
+                cursor = db.query(
+                    NoteKeeperDatabaseContract.NoteInfoEntry.TABLE_NAME,
+                    projection,
+                    selection,
+                    selectionArgs,
+                    null,
+                    null,
+                    sortOrder
+                )
+            }
+        }
+
 
         return cursor
     }
