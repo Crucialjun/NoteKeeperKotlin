@@ -7,6 +7,8 @@ import android.net.Uri
 
 class NoteKeeperProvider : ContentProvider() {
 
+    lateinit var dbOpenHelper: NoteKeeperOpenHelper
+
     override fun delete(uri: Uri, selection: String?, selectionArgs: Array<String>?): Int {
         TODO("Implement this to handle requests to delete one or more rows")
     }
@@ -23,14 +25,27 @@ class NoteKeeperProvider : ContentProvider() {
     }
 
     override fun onCreate(): Boolean {
-        TODO("Implement this to initialize your content provider on startup.")
+        dbOpenHelper = NoteKeeperOpenHelper(context)
+        return true
     }
 
     override fun query(
         uri: Uri, projection: Array<String>?, selection: String?,
         selectionArgs: Array<String>?, sortOrder: String?
     ): Cursor? {
-        TODO("Implement this to handle query requests from clients.")
+        var cursor: Cursor? = null
+        val db = dbOpenHelper.readableDatabase
+        cursor = db.query(
+            NoteKeeperDatabaseContract.CourseInfoEntry.TABLE_NAME,
+            projection,
+            selection,
+            selectionArgs,
+            null,
+            null,
+            sortOrder
+        )
+
+        return cursor
     }
 
     override fun update(

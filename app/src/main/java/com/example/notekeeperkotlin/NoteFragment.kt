@@ -3,6 +3,7 @@ package com.example.notekeeperkotlin
 import android.content.ContentValues
 import android.content.Intent
 import android.database.Cursor
+import android.net.Uri
 import android.os.Bundle
 import android.view.*
 import android.widget.SimpleCursorAdapter
@@ -409,24 +410,39 @@ class NoteFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor> {
 
     private fun createLoaderCourses(): CursorLoader {
         coursesQueryFinished = false
-        return object : CursorLoader(requireContext()) {
-            override fun loadInBackground(): Cursor? {
-                val db = dbOpenHelper.readableDatabase
-                val courseColumns = arrayOf(
-                    CourseInfoEntry.COLUMN_COURSE_TITLE,
-                    CourseInfoEntry.COLUMN_COURSE_ID,
-                    CourseInfoEntry._ID
-                )
-                return db.query(
-                    CourseInfoEntry.TABLE_NAME, courseColumns,
-                    null,
-                    null,
-                    null,
-                    null,
-                    CourseInfoEntry.COLUMN_COURSE_TITLE
-                )
-            }
-        }
+
+        val uri = Uri.parse("content://com.example.notekeeperkotlin.provider")
+
+        val courseColumns = arrayOf(
+            CourseInfoEntry.COLUMN_COURSE_TITLE,
+            CourseInfoEntry.COLUMN_COURSE_ID,
+            CourseInfoEntry._ID
+        )
+
+        return object : CursorLoader(
+            requireContext(),
+            uri,
+            courseColumns,
+            null,
+            null,
+            CourseInfoEntry.COLUMN_COURSE_TITLE
+        ) {}
+
+
+//        return object : CursorLoader(requireContext()) {
+//            override fun loadInBackground(): Cursor? {
+//                val db = dbOpenHelper.readableDatabase
+//
+//                return db.query(
+//                    CourseInfoEntry.TABLE_NAME, courseColumns,
+//                    null,
+//                    null,
+//                    null,
+//                    null,
+//                    CourseInfoEntry.COLUMN_COURSE_TITLE
+//                )
+//            }
+//        }
     }
 
     private fun createLoaderNotes(): CursorLoader {
