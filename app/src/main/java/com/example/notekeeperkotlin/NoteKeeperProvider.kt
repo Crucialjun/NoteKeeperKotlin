@@ -2,12 +2,15 @@ package com.example.notekeeperkotlin
 
 import android.content.*
 import android.database.Cursor
+import android.database.sqlite.SQLiteDatabase
 import android.net.Uri
+import com.example.notekeeperkotlin.NoteKeeperDatabaseContract.CourseInfoEntry
+import com.example.notekeeperkotlin.NoteKeeperDatabaseContract.NoteInfoEntry
 
 class NoteKeeperProvider : ContentProvider() {
 
-    lateinit var dbOpenHelper: NoteKeeperOpenHelper
-    val uriMatcher = UriMatcher(UriMatcher.NO_MATCH)
+    private lateinit var dbOpenHelper: NoteKeeperOpenHelper
+    private val uriMatcher = UriMatcher(UriMatcher.NO_MATCH)
 
     init {
         uriMatcher.addURI(
@@ -19,6 +22,11 @@ class NoteKeeperProvider : ContentProvider() {
             NoteKeeperProviderContract.AUTHORITY,
             NoteKeeperProviderContract.Notes.PATH,
             1
+        )
+        uriMatcher.addURI(
+            NoteKeeperProviderContract.AUTHORITY,
+            NoteKeeperProviderContract.Notes.PATH_EXPANDED,
+            2
         )
     }
 
@@ -49,13 +57,11 @@ class NoteKeeperProvider : ContentProvider() {
         var cursor: Cursor? = null
         val db = dbOpenHelper.readableDatabase
 
-        val uriMatch = uriMatcher.match(uri)
-
-        when (uriMatch) {
+        when (uriMatcher.match(uri)) {
             0 -> {
 
                 cursor = db.query(
-                    NoteKeeperDatabaseContract.CourseInfoEntry.TABLE_NAME,
+                    CourseInfoEntry.TABLE_NAME,
                     projection,
                     selection,
                     selectionArgs,
@@ -67,7 +73,7 @@ class NoteKeeperProvider : ContentProvider() {
             }
             1 -> {
                 cursor = db.query(
-                    NoteKeeperDatabaseContract.NoteInfoEntry.TABLE_NAME,
+                    NoteInfoEntry.TABLE_NAME,
                     projection,
                     selection,
                     selectionArgs,
@@ -76,10 +82,40 @@ class NoteKeeperProvider : ContentProvider() {
                     sortOrder
                 )
             }
+            2 -> {
+                cursor = notesExpandedQuery(db, projection, selection, selectionArgs, sortOrder)
+            }
         }
 
 
         return cursor
+    }
+
+    private fun notesExpandedQuery(
+        db: SQLiteDatabase?,
+        projection: Array<String>?,
+        selection: String?,
+        selectionArgs: Array<String>?,
+        sortOrder: String?
+    ): Cursor? {
+        val tablesWithJoin = "${
+            NoteInfoEntry.TABLE_NAME
+        } JOIN " +
+                "${CourseInfoEntry.TABLE_NAME} ON " +
+                "${NoteInfoEntry.getQName(NoteInfoEntry.COLUMN_COURSE_ID)} = " +
+                CourseInfoEntry.COLUMN_COURSE_ID
+
+        return db!!.query(
+            tablesWithJoin,
+            projection,
+            selection,
+            selectionArgs,
+            null,
+            null,
+            sortOrder
+        )
+
+
     }
 
     override fun update(

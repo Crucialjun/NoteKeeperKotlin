@@ -43,11 +43,15 @@ object NoteKeeperProviderContract {
         val CONTENT_URI = Uri.withAppendedPath(AUTHORITY_URI, PATH)
     }
 
-    object Notes : NoteColumns, BaseColumns, Columns_Course_Id {
+    object Notes : NoteColumns, BaseColumns, Columns_Course_Id, CourseColumns {
         const val PATH = "notes"
 
         //content://com.example.notekeeperkotlin.provider/course
         val CONTENT_URI = Uri.withAppendedPath(AUTHORITY_URI, PATH)
+        const val COLUMN_COURSE_TITLE = CourseColumns.COLUMN_COURSE_TITLE
+        const val COLUMN_NOTE_TITLE = NoteColumns.COLUMN_NOTE_TITLE
+        const val PATH_EXPANDED = "notes_expanded"
+        val CONTENT_EXPANDED_URI = Uri.withAppendedPath(AUTHORITY_URI, PATH_EXPANDED)
     }
 
 
