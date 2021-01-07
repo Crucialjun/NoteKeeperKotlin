@@ -17,4 +17,9 @@
         android:icon="@android:drawable/ic_media_next"
         android:title="@string/next"
         app:showAsAction="ifRoom|withText" />
+    <item
+        android:id="@+id/action_delete"
+        android:icon="@android:drawable/ic_delete"
+        android:title="Delete"
+        app:showAsAction="ifRoom|withText" />
 </menu>

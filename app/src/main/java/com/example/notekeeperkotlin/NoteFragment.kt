@@ -3,7 +3,6 @@ package com.example.notekeeperkotlin
 import android.content.ContentValues
 import android.content.Intent
 import android.database.Cursor
-import android.net.Uri
 import android.os.Bundle
 import android.view.*
 import android.widget.SimpleCursorAdapter
@@ -275,6 +274,11 @@ class NoteFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor> {
                 moveNext()
                 return true
             }
+            R.id.action_delete -> {
+                deleteFromSqDatabase()
+                requireActivity().onBackPressed()
+                return true
+            }
             else -> super.onOptionsItemSelected(item)
         }
     }
@@ -411,13 +415,13 @@ class NoteFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor> {
     private fun createLoaderCourses(): CursorLoader {
         coursesQueryFinished = false
 
-        val uri = Uri.parse("content://com.example.notekeeperkotlin.provider")
-
+        val uri = NoteKeeperProviderContract().Courses().CONTENT_URI
         val courseColumns = arrayOf(
-            CourseInfoEntry.COLUMN_COURSE_TITLE,
-            CourseInfoEntry.COLUMN_COURSE_ID,
-            CourseInfoEntry._ID
-        )
+            NoteKeeperProviderContract().Courses().COLUMN_COURSE_TITLE,
+            NoteKeeperProviderContract().Courses().COLUMN_COURSE_ID,
+            NoteKeeperProviderContract().Courses()._ID,
+
+            )
 
         return object : CursorLoader(
             requireContext(),
@@ -425,8 +429,10 @@ class NoteFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor> {
             courseColumns,
             null,
             null,
-            CourseInfoEntry.COLUMN_COURSE_TITLE
-        ) {}
+            NoteKeeperProviderContract().Courses().COLUMN_COURSE_TITLE
+        ) {
+
+        }
 
 
 //        return object : CursorLoader(requireContext()) {

@@ -4,6 +4,7 @@ import android.content.*
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.net.Uri
+import android.provider.BaseColumns
 import com.example.notekeeperkotlin.NoteKeeperDatabaseContract.CourseInfoEntry
 import com.example.notekeeperkotlin.NoteKeeperDatabaseContract.NoteInfoEntry
 
@@ -14,18 +15,18 @@ class NoteKeeperProvider : ContentProvider() {
 
     init {
         uriMatcher.addURI(
-            NoteKeeperProviderContract.AUTHORITY,
-            NoteKeeperProviderContract.Courses.PATH,
+            NoteKeeperProviderContract().authority,
+            NoteKeeperProviderContract().Courses().PATH,
             0
         )
         uriMatcher.addURI(
-            NoteKeeperProviderContract.AUTHORITY,
-            NoteKeeperProviderContract.Notes.PATH,
+            NoteKeeperProviderContract().authority,
+            NoteKeeperProviderContract().Notes().PATH,
             1
         )
         uriMatcher.addURI(
-            NoteKeeperProviderContract.AUTHORITY,
-            NoteKeeperProviderContract.Notes.PATH_EXPANDED,
+            NoteKeeperProviderContract().authority,
+            NoteKeeperProviderContract().Notes().PATH_EXPANDED,
             2
         )
     }
@@ -98,16 +99,29 @@ class NoteKeeperProvider : ContentProvider() {
         selectionArgs: Array<String>?,
         sortOrder: String?
     ): Cursor? {
+        val columns = arrayOfNulls<String>(projection?.size!!)
+
+        for (x in 0 until projection.size) {
+            if (projection[x] == BaseColumns._ID ||
+                projection[x] == NoteKeeperProviderContract.CoursesIdColumns.COLUMN_COURSE_ID
+            ) {
+                columns[x] = NoteInfoEntry.getQName(projection[x])
+            } else {
+                columns[x] = projection[x]
+            }
+        }
+
+
         val tablesWithJoin = "${
             NoteInfoEntry.TABLE_NAME
         } JOIN " +
                 "${CourseInfoEntry.TABLE_NAME} ON " +
                 "${NoteInfoEntry.getQName(NoteInfoEntry.COLUMN_COURSE_ID)} = " +
-                CourseInfoEntry.COLUMN_COURSE_ID
+                CourseInfoEntry.getQName(CourseInfoEntry.COLUMN_COURSE_ID)
 
         return db!!.query(
             tablesWithJoin,
-            projection,
+            columns,
             selection,
             selectionArgs,
             null,

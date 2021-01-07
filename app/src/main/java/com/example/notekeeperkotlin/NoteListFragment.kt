@@ -10,8 +10,6 @@ import androidx.loader.content.Loader
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.notekeeperkotlin.NoteKeeperDatabaseContract.NoteInfoEntry
-import com.example.notekeeperkotlin.NoteKeeperProviderContract.Notes
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 /**
@@ -100,24 +98,30 @@ class NoteListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor> {
             //val db = dbOpenHelper.readableDatabase
 
             val noteColumns = arrayOf(
-                Notes.COLUMN_NOTE_TITLE,
-                NoteInfoEntry.getQName(NoteInfoEntry._ID),
-                Notes.COLUMN_COURSE_TITLE
+                NoteKeeperProviderContract().Notes()._ID,
+                NoteKeeperProviderContract().Notes().COLUMN_NOTE_TITLE,
+                NoteKeeperProviderContract().Notes().COLUMN_COURSE_TITLE
+
             )
 
 
-            val noteOrderBy = (Notes.COLUMN_COURSE_TITLE
-                    + "," + Notes.COLUMN_NOTE_TITLE)
+            val notesOrderBy =
+                NoteKeeperProviderContract().Courses().COLUMN_COURSE_TITLE +
+                        ",${NoteKeeperProviderContract().Notes().COLUMN_NOTE_TITLE}"
 
 
 
             loader = CursorLoader(
                 requireContext(),
-                Notes.CONTENT_EXPANDED_URI, noteColumns, null, null, noteOrderBy
+                NoteKeeperProviderContract().Notes().CONTENT_EXPANDED_URI,
+                noteColumns,
+                null,
+                null,
+                notesOrderBy
             )
         }
 
-        return loader!!
+        return loader as CursorLoader
     }
 
     override fun onLoadFinished(loader: Loader<Cursor>, data: Cursor?) {

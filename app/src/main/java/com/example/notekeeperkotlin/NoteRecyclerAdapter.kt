@@ -69,6 +69,7 @@ class NoteRecyclerAdapter(context: Context, private var cursor: Cursor?) :
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        cursor!!.moveToFirst()
         cursor!!.moveToPosition(position)
         val course = cursor!!.getString(coursePos)
         val noteTitle = cursor!!.getString(noteTitlePos)
