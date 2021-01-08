@@ -1,8 +1,8 @@
 package com.example.notekeeperkotlin
 
-import android.content.ContentValues
-import android.content.Intent
+import android.content.*
 import android.database.Cursor
+import android.net.Uri
 import android.os.Bundle
 import android.view.*
 import android.widget.SimpleCursorAdapter
@@ -43,6 +43,7 @@ class NoteFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor> {
     private val LOADER_COURSES = 1
     private var coursesQueryFinished = false
     private var notessQueryFinished = false
+    private var noteUri: Uri = Uri.EMPTY
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -109,10 +110,11 @@ class NoteFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor> {
 //        noteId =
 //            db.insert(NoteInfoEntry.TABLE_NAME, null, values).toInt()
 
-        val uri = requireContext().contentResolver.insert(
+
+        noteUri = requireContext().contentResolver.insert(
             NoteKeeperProviderContract().Notes().CONTENT_URI,
             values
-        )
+        )!!
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -458,32 +460,27 @@ class NoteFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor> {
 
     private fun createLoaderNotes(): CursorLoader {
         notessQueryFinished = false
-        return object : CursorLoader(requireContext()) {
-            override fun loadInBackground(): Cursor? {
-                val db = dbOpenHelper.readableDatabase
+        val noteColumns = arrayOf(
+            NoteKeeperProviderContract().Notes().COLUMN_COURSE_ID,
+            NoteKeeperProviderContract().Notes().COLUMN_NOTE_TITLE,
+            NoteKeeperProviderContract().Notes().COLUMN_NOTE_TEXT
+        )
 
-                val selection = "${NoteInfoEntry._ID} = ?"
+        noteUri = ContentUris.withAppendedId(
+            NoteKeeperProviderContract().Notes().CONTENT_URI,
+            noteId.toLong()
+        )
 
-                val selectionArgs = arrayOf(noteId.toString())
+        return CursorLoader(
+            requireContext(),
+            noteUri,
+            noteColumns,
+            null,
+            null,
+            null
+        )
 
 
-                val noteColumns = arrayOf(
-                    NoteInfoEntry.COLUMN_COURSE_ID,
-                    NoteInfoEntry.COLUMN_NOTE_TITLE,
-                    NoteInfoEntry.COLUMN_NOTE_TEXT
-                )
-
-                return db.query(
-                    NoteInfoEntry.TABLE_NAME,
-                    noteColumns,
-                    selection,
-                    selectionArgs,
-                    null,
-                    null,
-                    null
-                )
-            }
-        }
     }
 
     override fun onLoadFinished(loader: Loader<Cursor>, data: Cursor?) {

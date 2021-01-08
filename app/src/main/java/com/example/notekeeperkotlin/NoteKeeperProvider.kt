@@ -29,6 +29,11 @@ class NoteKeeperProvider : ContentProvider() {
             NoteKeeperProviderContract().Notes().PATH_EXPANDED,
             2
         )
+        uriMatcher.addURI(
+            NoteKeeperProviderContract().authority,
+            "${NoteKeeperProviderContract().Notes().PATH}/#",
+            3
+        )
     }
 
     override fun delete(uri: Uri, selection: String?, selectionArgs: Array<String>?): Int {
@@ -43,7 +48,41 @@ class NoteKeeperProvider : ContentProvider() {
     }
 
     override fun insert(uri: Uri, values: ContentValues?): Uri? {
-        TODO("Implement this to handle requests to insert a new row.")
+        val db = dbOpenHelper.writableDatabase
+        var rowId: Long = -1
+        var rowUri: Uri? = null
+
+        when (uriMatcher.match(uri)) {
+            1 -> {
+                rowId = db.insert(NoteInfoEntry.TABLE_NAME, null, values)
+
+                //content://com.example.notekeeperkotlin.provider/notes/1
+
+                rowUri = ContentUris.withAppendedId(
+                    NoteKeeperProviderContract().Notes().CONTENT_URI,
+                    rowId
+                )
+
+
+            }
+
+            0 -> {
+                rowId = db.insert(CourseInfoEntry.TABLE_NAME, null, values)
+
+                //content://com.example.notekeeperkotlin.provider/courses/1
+
+                rowUri = ContentUris.withAppendedId(
+                    NoteKeeperProviderContract().Courses().CONTENT_URI,
+                    rowId
+                )
+            }
+
+            2 -> {
+                // Throw exceprion read only table
+            }
+        }
+
+        return rowUri
     }
 
     override fun onCreate(): Boolean {
@@ -86,6 +125,22 @@ class NoteKeeperProvider : ContentProvider() {
             2 -> {
                 cursor = notesExpandedQuery(db, projection, selection, selectionArgs, sortOrder)
             }
+
+            3 -> {
+                val rowId = ContentUris.parseId(uri)
+                val rowSelection = NoteInfoEntry._ID
+                val rowSelectionArgs = arrayOf(rowId.toString())
+
+                cursor = db.query(
+                    NoteInfoEntry.TABLE_NAME,
+                    projection,
+                    rowSelection,
+                    rowSelectionArgs,
+                    null,
+                    null,
+                    null
+                )
+            }
         }
 
 
@@ -101,7 +156,7 @@ class NoteKeeperProvider : ContentProvider() {
     ): Cursor? {
         val columns = arrayOfNulls<String>(projection?.size!!)
 
-        for (x in 0 until projection.size) {
+        for (x in projection.indices) {
             if (projection[x] == BaseColumns._ID ||
                 projection[x] == NoteKeeperProviderContract.CoursesIdColumns.COLUMN_COURSE_ID
             ) {
