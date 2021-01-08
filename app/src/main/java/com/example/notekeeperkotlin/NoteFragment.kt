@@ -101,13 +101,18 @@ class NoteFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor> {
 
         val values = ContentValues()
 
-        values.put(NoteInfoEntry.COLUMN_COURSE_ID, "")
-        values.put(NoteInfoEntry.COLUMN_NOTE_TITLE, "")
-        values.put(NoteInfoEntry.COLUMN_NOTE_TEXT, "")
+        values.put(NoteKeeperProviderContract().Notes().COLUMN_COURSE_ID, "")
+        values.put(NoteKeeperProviderContract().Notes().COLUMN_NOTE_TITLE, "")
+        values.put(NoteKeeperProviderContract().Notes().COLUMN_NOTE_TEXT, "")
 
-        val db = dbOpenHelper.writableDatabase
-        noteId =
-            db.insert(NoteInfoEntry.TABLE_NAME, null, values).toInt()
+//        val db = dbOpenHelper.writableDatabase
+//        noteId =
+//            db.insert(NoteInfoEntry.TABLE_NAME, null, values).toInt()
+
+        val uri = requireContext().contentResolver.insert(
+            NoteKeeperProviderContract().Notes().CONTENT_URI,
+            values
+        )
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
