@@ -12,6 +12,7 @@ class NoteKeeperProvider : ContentProvider() {
 
     private lateinit var dbOpenHelper: NoteKeeperOpenHelper
     private val uriMatcher = UriMatcher(UriMatcher.NO_MATCH)
+    val mimeVendorType = "vnd.${NoteKeeperProviderContract().authority}."
 
     init {
         uriMatcher.addURI(
@@ -41,15 +42,36 @@ class NoteKeeperProvider : ContentProvider() {
     }
 
     override fun getType(uri: Uri): String? {
-        TODO(
-            "Implement this to handle requests for the MIME type of the data" +
-                    "at the given URI"
-        )
+        var mimeType: String? = null
+        when (uriMatcher.match(uri)) {
+            0 -> {
+                //vnd.android.cursor.dir/vnd.com.example.notekeeperkotlin.provider.course
+
+
+                mimeType = ContentResolver.CURSOR_DIR_BASE_TYPE + "/"
+                mimeVendorType + NoteKeeperProviderContract().Courses().PATH
+            }
+            1 -> {
+                mimeType = ContentResolver.CURSOR_DIR_BASE_TYPE + "/"
+                mimeVendorType + NoteKeeperProviderContract().Notes().PATH
+            }
+            2 -> {
+                mimeType = ContentResolver.CURSOR_DIR_BASE_TYPE + "/"
+                mimeVendorType + NoteKeeperProviderContract().Notes().PATH_EXPANDED
+            }
+            3 -> {
+                mimeType = ContentResolver.CURSOR_ITEM_BASE_TYPE + "/"
+                mimeVendorType + NoteKeeperProviderContract().Notes().PATH
+            }
+
+        }
+
+        return mimeType
     }
 
     override fun insert(uri: Uri, values: ContentValues?): Uri? {
         val db = dbOpenHelper.writableDatabase
-        var rowId: Long = -1
+        val rowId: Long
         var rowUri: Uri? = null
 
         when (uriMatcher.match(uri)) {
@@ -78,7 +100,7 @@ class NoteKeeperProvider : ContentProvider() {
             }
 
             2 -> {
-                // Throw exceprion read only table
+                // Throw exception read only table
             }
         }
 

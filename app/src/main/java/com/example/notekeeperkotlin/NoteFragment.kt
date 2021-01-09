@@ -1,5 +1,6 @@
 package com.example.notekeeperkotlin
 
+import android.app.*
 import android.content.*
 import android.database.Cursor
 import android.net.Uri
@@ -44,7 +45,11 @@ class NoteFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor> {
     private var coursesQueryFinished = false
     private var notessQueryFinished = false
     private var noteUri: Uri = Uri.EMPTY
-
+    lateinit var notificationManager: NotificationManager
+    lateinit var notificationChannel: NotificationChannel
+    lateinit var builder: Notification.Builder
+    private val channelId = "com.example.notekeeperkotlin"
+    private val description = "Test notification"
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -72,6 +77,7 @@ class NoteFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor> {
 
         return view
     }
+
 
     private fun saveOriginalNoteValues() {
         if (isNewNote) {
@@ -154,6 +160,7 @@ class NoteFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor> {
             //loadNoteData()
             loaderManager.initLoader(LOADER_NOTES, null, this)
         }
+
     }
 
     private fun loadCourseData() {
@@ -286,8 +293,17 @@ class NoteFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor> {
                 requireActivity().onBackPressed()
                 return true
             }
+            R.id.action_set_reminder -> {
+                showReminderNotification()
+                return true
+            }
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+
+    private fun showReminderNotification() {
+        NotificationHelper(requireContext())
     }
 
     override fun onPrepareOptionsMenu(menu: Menu) {

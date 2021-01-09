@@ -22,4 +22,8 @@
         android:icon="@android:drawable/ic_delete"
         android:title="Delete"
         app:showAsAction="ifRoom|withText" />
+
+    <item
+        android:id="@+id/action_set_reminder"
+        android:title="Set Reminder" />
 </menu>
