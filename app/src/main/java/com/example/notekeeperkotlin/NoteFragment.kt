@@ -303,7 +303,9 @@ class NoteFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor> {
 
 
     private fun showReminderNotification() {
-        NotificationHelper(requireContext())
+        val noteText = textNoteText!!.text.toString()
+        val noteTitle = textNoteTitle!!.text.toString()
+        NotificationHelper(requireContext(), noteText, noteTitle)
     }
 
     override fun onPrepareOptionsMenu(menu: Menu) {

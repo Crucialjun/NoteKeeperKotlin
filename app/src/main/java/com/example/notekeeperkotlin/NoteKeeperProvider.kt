@@ -12,7 +12,7 @@ class NoteKeeperProvider : ContentProvider() {
 
     private lateinit var dbOpenHelper: NoteKeeperOpenHelper
     private val uriMatcher = UriMatcher(UriMatcher.NO_MATCH)
-    val mimeVendorType = "vnd.${NoteKeeperProviderContract().authority}."
+    private val mimeVendorType = "vnd.${NoteKeeperProviderContract().authority}."
 
     init {
         uriMatcher.addURI(
@@ -150,7 +150,7 @@ class NoteKeeperProvider : ContentProvider() {
 
             3 -> {
                 val rowId = ContentUris.parseId(uri)
-                val rowSelection = NoteInfoEntry._ID
+                val rowSelection = NoteInfoEntry.getQName(NoteInfoEntry._ID) + " = ?"
                 val rowSelectionArgs = arrayOf(rowId.toString())
 
                 cursor = db.query(

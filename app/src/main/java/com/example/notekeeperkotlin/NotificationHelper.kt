@@ -3,16 +3,19 @@ package com.example.notekeeperkotlin
 import android.app.*
 import android.content.Context
 import android.content.ContextWrapper
-import android.graphics.Color
+import android.graphics.*
 
-class NotificationHelper(val context: Context) : ContextWrapper(context) {
+class NotificationHelper(
+    val context: Context,
+    private val notificationText: String,
+    private val noteTitle: String
+) : ContextWrapper(context) {
     private val channel1Id = "Channel1Id"
     private val channel1Name = "Channel One"
-    val channel2Id = "Channel2Id"
-    val channel2Name = "Channel 2"
     private lateinit var manager: NotificationManager
-    lateinit var builder: Notification.Builder
-    lateinit var notificationChannel: NotificationChannel
+    private lateinit var builder: Notification.Builder
+    private lateinit var notificationChannel: NotificationChannel
+    private val picture: Bitmap = BitmapFactory.decodeResource(resources, R.drawable.logo)
 
     init {
         createChannel()
@@ -34,8 +37,22 @@ class NotificationHelper(val context: Context) : ContextWrapper(context) {
 
             builder = Notification.Builder(context, channel1Id)
                 .setSmallIcon(R.drawable.ic_baseline_assignment_24)
+                .setContentTitle("Review Note")
+                .setContentText(notificationText)
+                .setLargeIcon(picture)
+                .setStyle(
+                    Notification.BigTextStyle()
+                        .bigText(notificationText)
+                        .setBigContentTitle(noteTitle)
+                        .setSummaryText("Review Note")
+                )
         } else {
             builder = Notification.Builder(context)
+                .setSmallIcon(R.drawable.ic_baseline_assignment_24)
+                .setContentTitle("Review Note")
+                .setContentText(notificationText)
+                .setLargeIcon(picture)
+                .setDefaults(Notification.DEFAULT_ALL)
         }
 
 
