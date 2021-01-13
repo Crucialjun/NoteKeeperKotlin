@@ -1,6 +1,7 @@
 package com.example.notekeeperkotlin
 
 import android.os.Bundle
+import android.os.StrictMode
 import android.preference.PreferenceManager
 import android.view.Menu
 import android.view.MenuItem
@@ -10,17 +11,14 @@ import androidx.appcompat.widget.Toolbar
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
-import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.navigateUp
-import androidx.navigation.ui.setupActionBarWithNavController
-import androidx.navigation.ui.setupWithNavController
+import androidx.navigation.ui.*
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
 
 class MainActivity2 : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
-    private lateinit var drawerLayout: DrawerLayout
+    lateinit var drawerLayout: DrawerLayout
     private lateinit var navController: NavController
     private lateinit var navView: NavigationView
 
@@ -30,6 +28,8 @@ class MainActivity2 : AppCompatActivity(), NavigationView.OnNavigationItemSelect
         setContentView(R.layout.activity_main2)
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
+
+        enableStrictMode()
 
         drawerLayout = findViewById(R.id.drawer_layout)
         navView = findViewById(R.id.nav_view)
@@ -48,6 +48,14 @@ class MainActivity2 : AppCompatActivity(), NavigationView.OnNavigationItemSelect
         navView.setNavigationItemSelectedListener(this)
         navView.menu.getItem(0).isChecked = true
         drawerLayout.closeDrawers()
+    }
+
+    private fun enableStrictMode() {
+        if (BuildConfig.DEBUG) {
+            val policy = StrictMode.ThreadPolicy.Builder().detectAll().penaltyLog().build()
+            StrictMode.setThreadPolicy(policy)
+        }
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

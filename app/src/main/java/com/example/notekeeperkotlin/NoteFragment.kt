@@ -4,10 +4,12 @@ import android.app.*
 import android.content.*
 import android.database.Cursor
 import android.net.Uri
+import android.os.AsyncTask
 import android.os.Bundle
 import android.view.*
 import android.widget.SimpleCursorAdapter
 import android.widget.Spinner
+import androidx.core.view.GravityCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -74,6 +76,7 @@ class NoteFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor> {
         readDisplayStateValues()
         saveOriginalNoteValues()
 
+        openDrawer()
 
         return view
     }
@@ -106,6 +109,20 @@ class NoteFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor> {
 //        notePosition = dm.createNewNote()
 //        mNote = dm.notes[notePosition]
 
+        val task = object : AsyncTask<ContentValues, Void, Uri>() {
+            override fun doInBackground(vararg p0: ContentValues?): Uri {
+                val insertValues = p0[0]
+
+                return requireContext().contentResolver.insert(
+                    NoteKeeperProviderContract().Notes().CONTENT_URI,
+                    insertValues
+                )!!
+            }
+
+            override fun onPostExecute(result: Uri?) {
+                noteUri = result!!
+            }
+        }
         val values = ContentValues()
 
         values.put(NoteKeeperProviderContract().Notes().COLUMN_COURSE_ID, "")
@@ -117,10 +134,9 @@ class NoteFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor> {
 //            db.insert(NoteInfoEntry.TABLE_NAME, null, values).toInt()
 
 
-        noteUri = requireContext().contentResolver.insert(
-            NoteKeeperProviderContract().Notes().CONTENT_URI,
-            values
-        )!!
+        task.execute(values)
+
+
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -540,5 +556,10 @@ class NoteFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor> {
         } else if (loader.id == LOADER_COURSES) {
             adapterCourses.changeCursor(null)
         }
+    }
+
+    private fun openDrawer() {
+        val drawer = MainActivity2().drawerLayout
+        drawer.openDrawer(GravityCompat.START)
     }
 }
