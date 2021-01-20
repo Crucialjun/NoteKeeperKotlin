@@ -8,7 +8,8 @@ import android.graphics.*
 class NotificationHelper(
     val context: Context,
     private val notificationText: String,
-    private val noteTitle: String
+    private val noteTitle: String,
+    private val noteId: Int
 ) : ContextWrapper(context) {
     private val channel1Id = "Channel1Id"
     private val channel1Name = "Channel One"
@@ -16,6 +17,7 @@ class NotificationHelper(
     private lateinit var builder: Notification.Builder
     private lateinit var notificationChannel: NotificationChannel
     private val picture: Bitmap = BitmapFactory.decodeResource(resources, R.drawable.logo)
+
 
     init {
         createChannel()
