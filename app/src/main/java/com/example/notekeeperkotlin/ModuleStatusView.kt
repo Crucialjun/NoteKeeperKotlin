@@ -44,6 +44,8 @@ class ModuleStatusView : View {
     }
 
 
+
+
     private fun init(attrs: AttributeSet?, defStyle: Int) {
 
         if (isInEditMode) {
@@ -98,6 +100,20 @@ class ModuleStatusView : View {
 
             moduleRectangles[i] = Rect(x.toInt(), y, shapeSize.toInt(), (y + shapeSize).toInt())
         }
+
+    }
+
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        var desiredWidth = 0
+        var desiredHeight = 0
+
+        desiredWidth = (((moduleStatus.size * (shapeSize + spacing)).toInt() - spacing).toInt())
+        desiredHeight = (shapeSize + paddingTop + paddingBottom).toInt()
+
+        val width = resolveSizeAndState(desiredWidth,widthMeasureSpec,0)
+        val height = resolveSizeAndState(desiredHeight,heightMeasureSpec,0)
+
+        setMeasuredDimension(width,height)
 
     }
 
