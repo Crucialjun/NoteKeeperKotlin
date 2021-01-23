@@ -76,7 +76,7 @@ class NoteFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor> {
         readDisplayStateValues()
         saveOriginalNoteValues()
 
-        openDrawer()
+        //openDrawer()
 
         return view
     }
