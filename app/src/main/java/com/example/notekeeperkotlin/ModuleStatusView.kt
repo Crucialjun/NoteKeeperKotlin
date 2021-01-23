@@ -70,7 +70,7 @@ class ModuleStatusView : View {
 
         radius = (shapeSize - outlineWidth) * 2
 
-        setUpModuleRectangles()
+
 
         paintOutline = Paint(Paint.ANTI_ALIAS_FLAG)
         paintOutline.style = Paint.Style.STROKE
@@ -98,10 +98,22 @@ class ModuleStatusView : View {
         moduleStatus = exampleModuleValues
     }
 
-    private fun setUpModuleRectangles() {
+    private fun setUpModuleRectangles(w: Int) {
+
+        val availablewidth = w - paddingLeft - paddingRight
+        val horizontalPossibleFit  : Int = (availablewidth / (shapeSize + spacing)).toInt()
+        val maximumHorizontalModules = horizontalPossibleFit.coerceAtMost(moduleStatus.size)
         for (i in moduleStatus.indices) {
-            val x : Int =( paddingLeft + ((shapeSize + spacing) * i)).toInt()
-            val y : Int = paddingTop
+            var row = 1
+            var column = 1
+            if( i != 0){
+                row = i / maximumHorizontalModules
+                column = i % maximumHorizontalModules
+            }
+
+
+            val x : Int = (paddingLeft + (shapeSize +spacing)*column).toInt()
+            val y : Int = (paddingTop + row * (shapeSize + spacing)).toInt()
 
             moduleRectangles[i] = Rect(x, y, x + shapeSize.toInt(), y + shapeSize.toInt())
         }
@@ -136,6 +148,9 @@ class ModuleStatusView : View {
 
     }
 
+    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+        setUpModuleRectangles(w)
+    }
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
