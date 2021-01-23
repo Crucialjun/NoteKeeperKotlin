@@ -93,8 +93,8 @@ class ModuleStatusView : View {
 
     private fun setUpModuleRectangles() {
         for (i in 0..moduleStatus.size) {
-            val x = (shapeSize + spacing) * i
-            val y = 0
+            val x = paddingLeft + ((shapeSize + spacing) * i)
+            val y = paddingTop
 
             moduleRectangles[i] = Rect(x.toInt(), y, shapeSize.toInt(), (y + shapeSize).toInt())
         }
