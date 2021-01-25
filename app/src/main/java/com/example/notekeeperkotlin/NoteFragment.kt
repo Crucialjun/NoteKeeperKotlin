@@ -52,6 +52,7 @@ class NoteFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor> {
     lateinit var builder: Notification.Builder
     private val channelId = "com.example.notekeeperkotlin"
     private val description = "Test notification"
+    private lateinit var viewModuleStatusView: ModuleStatusView
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -77,6 +78,8 @@ class NoteFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor> {
         saveOriginalNoteValues()
 
         //openDrawer()
+
+
 
         return view
     }
@@ -176,6 +179,15 @@ class NoteFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor> {
             //loadNoteData()
             loaderManager.initLoader(LOADER_NOTES, null, this)
         }
+
+        viewModuleStatusView = view.findViewById(R.id.module_status)
+
+        loadModuleStatusValues()
+
+
+    }
+
+    private fun loadModuleStatusValues() {
 
     }
 

@@ -34,5 +34,6 @@
         android:src="@drawable/ic_baseline_add_circle_24"
         android:tint="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        android:contentDescription="Create new note" />
 </androidx.constraintlayout.widget.ConstraintLayout>
